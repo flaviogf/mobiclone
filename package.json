@@ -1,0 +1,33 @@
+{
+  "name": "mobilis",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:flaviogf/mobilis.git",
+  "author": "flaviogf <flavio.fernandes6@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@sucrase/jest-plugin": "2.0.0",
+    "@types/jest": "24.0.22",
+    "eslint": "^6.6.0",
+    "eslint-config-prettier": "6.5.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "faker": "4.1.0",
+    "jest": "24.9.0",
+    "nodemon": "1.19.4",
+    "prettier": "1.19.1",
+    "sucrase": "3.10.1"
+  },
+  "scripts": {
+    "start": "nodemon src/presenter/api/server.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "date-fns": "2.7.0",
+    "express": "4.17.1",
+    "uuid": "3.3.3"
+  }
+}
