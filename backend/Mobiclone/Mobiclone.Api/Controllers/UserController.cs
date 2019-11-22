@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
 using Mobiclone.Api.Models;
 using Mobiclone.Api.ViewModels.User;
@@ -12,9 +13,12 @@ namespace Mobiclone.Api.Controllers
     {
         private readonly MobicloneContext _context;
 
-        public UserController(MobicloneContext context)
+        private readonly IHash _hash;
+
+        public UserController(MobicloneContext context, IHash hash)
         {
             _context = context;
+            _hash = hash;
         }
 
         [HttpPost]
@@ -25,14 +29,14 @@ namespace Mobiclone.Api.Controllers
             {
                 Name = viewModel.Name,
                 Email = viewModel.Email,
-                Password = await Hash.Make(viewModel.Password)
+                PasswordHash = await _hash.Make(viewModel.Password)
             };
 
             await _context.Users.AddAsync(user);
 
             await _context.SaveChangesAsync();
 
-            return Ok(user.Id);
+            return Ok(new { Data = user.Id });
         }
     }
 }

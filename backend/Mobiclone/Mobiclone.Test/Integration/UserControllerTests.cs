@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Mobiclone.Api;
 using Mobiclone.Api.Controllers;
+using Mobiclone.Api.Database;
+using Mobiclone.Api.Lib;
 using Mobiclone.Api.ViewModels.User;
 using System;
 using Xunit;
@@ -11,6 +12,7 @@ namespace Mobiclone.Test.Integration
     public class UserControllerTests : IDisposable
     {
         private readonly MobicloneContext _context;
+
         private readonly UserController _controller;
 
         public UserControllerTests()
@@ -19,7 +21,9 @@ namespace Mobiclone.Test.Integration
 
             _context = new MobicloneContext(builder.Options);
 
-            _controller = new UserController(_context);
+            var hash = new Bcrypt();
+
+            _controller = new UserController(_context, hash);
 
             _context.Database.EnsureCreated();
         }

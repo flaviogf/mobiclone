@@ -2,7 +2,7 @@
 
 namespace Mobiclone.Api.Migrations
 {
-    public partial class add_column_users_file_id : Migration
+    public partial class add_column_users_file : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

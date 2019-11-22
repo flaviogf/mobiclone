@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Mobiclone.Api.Models;
 
-namespace Mobiclone.Api
+namespace Mobiclone.Api.Database
 {
     public class MobicloneContext : DbContext
     {

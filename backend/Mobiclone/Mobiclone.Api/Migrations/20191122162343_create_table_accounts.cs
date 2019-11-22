@@ -12,8 +12,8 @@ namespace Mobiclone.Api.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(nullable: true),
-                    Type = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(maxLength: 255, nullable: false),
+                    Type = table.Column<string>(maxLength: 255, nullable: false),
                     UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>

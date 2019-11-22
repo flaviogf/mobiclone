@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Mobiclone.Api.Database;
+using Mobiclone.Api.Lib;
 
 namespace Mobiclone.Api
 {
@@ -21,6 +23,8 @@ namespace Mobiclone.Api
             var connectionString = _configuration.GetConnectionString("Default");
 
             services.AddDbContext<MobicloneContext>(options => options.UseSqlServer(connectionString));
+
+            services.AddScoped<IHash, Bcrypt>();
 
             services.AddControllers();
         }

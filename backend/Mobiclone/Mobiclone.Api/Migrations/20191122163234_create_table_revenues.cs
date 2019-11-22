@@ -13,7 +13,7 @@ namespace Mobiclone.Api.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(maxLength: 255, nullable: false),
                     Value = table.Column<int>(nullable: false),
                     Date = table.Column<DateTime>(nullable: false),
                     AccountId = table.Column<int>(nullable: false)
