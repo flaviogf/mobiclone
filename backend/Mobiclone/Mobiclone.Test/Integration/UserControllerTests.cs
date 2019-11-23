@@ -40,7 +40,7 @@ namespace Mobiclone.Test.Integration
 
             var response = await _controller.Store(viewModel);
 
-            Assert.IsAssignableFrom<OkObjectResult>(response);
+            Assert.IsAssignableFrom<CreatedResult>(response);
         }
 
         [Fact]

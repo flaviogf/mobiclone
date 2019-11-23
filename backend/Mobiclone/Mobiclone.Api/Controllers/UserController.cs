@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
@@ -8,7 +9,7 @@ using Mobiclone.Api.ViewModels.User;
 namespace Mobiclone.Api.Controllers
 {
     [ApiController]
-    [Route("{controller}")]
+    [Route("[controller]")]
     public class UserController : Controller
     {
         private readonly MobicloneContext _context;
@@ -23,6 +24,10 @@ namespace Mobiclone.Api.Controllers
 
         [HttpPost]
         [Route("")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Store(StoreUserViewModel viewModel)
         {
             var user = new User
@@ -36,7 +41,7 @@ namespace Mobiclone.Api.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok(new { Data = user.Id });
+            return Created($"/User/{user.Id}", new { Data = user.Id });
         }
     }
 }
