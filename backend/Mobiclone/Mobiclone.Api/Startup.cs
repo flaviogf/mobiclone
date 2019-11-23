@@ -21,10 +21,13 @@ namespace Mobiclone.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = _configuration.GetConnectionString("Default");
+            var connectionString = _configuration["ConnectionStrings:Default"];
+
+            var secret = _configuration["Auth:Secret"];
 
             services.AddDbContext<MobicloneContext>(options => options.UseSqlServer(connectionString));
 
+            services.AddScoped<IAuth>((provider) => new JwtAuth(secret));
             services.AddScoped<IHash, Bcrypt>();
 
             services.AddControllers();
