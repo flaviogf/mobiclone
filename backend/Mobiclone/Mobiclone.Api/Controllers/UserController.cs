@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
 using Mobiclone.Api.Models;
+using Mobiclone.Api.ViewModels;
 using Mobiclone.Api.ViewModels.User;
 
 namespace Mobiclone.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("user")]
     public class UserController : Controller
     {
         private readonly MobicloneContext _context;
@@ -41,7 +42,9 @@ namespace Mobiclone.Api.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Created($"/User/{user.Id}", new { Data = user.Id });
+            var response = new ResponseViewModel<int>(user.Id);
+
+            return Created($"/user/{user.Id}", response);
         }
     }
 }

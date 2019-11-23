@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mobiclone.Api.Lib;
+using Mobiclone.Api.ViewModels;
 using Mobiclone.Api.ViewModels.Session;
 using System.Threading.Tasks;
 
 namespace Mobiclone.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("session")]
     public class SessionController : Controller
     {
         private readonly IAuth _auth;
@@ -28,7 +29,9 @@ namespace Mobiclone.Api.Controllers
         {
             var token = await _auth.Attempt(viewModel.Email, viewModel.Password);
 
-            return Ok(new { Data = token });
+            var response = new ResponseViewModel<string>(token);
+
+            return Ok(response);
         }
     }
 }
