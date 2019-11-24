@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Mobiclone.Api.Controllers;
 using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
 using Mobiclone.Api.ViewModels;
 using Mobiclone.Api.ViewModels.Session;
 using System;
+using System.Text;
 using Xunit;
 
 namespace Mobiclone.Test.Integration
@@ -20,6 +22,8 @@ namespace Mobiclone.Test.Integration
         {
             var builder = new DbContextOptionsBuilder<MobicloneContext>().UseInMemoryDatabase("session");
 
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("XXXXXXXXXXXXXXXXXXXXXXXX"));
+
             _context = new MobicloneContext(builder.Options);
 
             var hash = new Bcrypt();
@@ -29,7 +33,7 @@ namespace Mobiclone.Test.Integration
                 hash: hash,
                 issuer: "test",
                 audience: "test",
-                secret: "XXXXXXXXXXXXXXXXXXXXXXXX"
+                secretKey: secretKey
             );
 
             _controller = new SessionController(auth);

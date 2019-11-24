@@ -1,9 +1,9 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Mobiclone.Api.Database;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Mobiclone.Api.Lib
@@ -18,15 +18,15 @@ namespace Mobiclone.Api.Lib
 
         private readonly string _audience;
 
-        private readonly string _secret;
+        private readonly SecurityKey _secretKey;
 
-        public Jwt(MobicloneContext context, IHash hash, string issuer, string audience, string secret)
+        public Jwt(MobicloneContext context, IHash hash, string issuer, string audience, SecurityKey secretKey)
         {
             _context = context;
             _hash = hash;
             _issuer = issuer;
             _audience = audience;
-            _secret = secret;
+            _secretKey = secretKey;
         }
 
         public async Task<string> Attempt(string email, string password)
@@ -38,16 +38,14 @@ namespace Mobiclone.Api.Lib
                 return null;
             }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));
-
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var credentials = new SigningCredentials(_secretKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new Claim[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString())
             };
 
-            var token = new JwtSecurityToken(issuer: _issuer, audience: _audience, claims: claims, signingCredentials: credentials);
+            var token = new JwtSecurityToken(issuer: _issuer, audience: _audience, claims: claims, signingCredentials: credentials, expires: DateTime.Now.AddMinutes(1));
 
             var handler = new JwtSecurityTokenHandler();
 

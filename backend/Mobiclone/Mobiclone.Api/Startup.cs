@@ -1,12 +1,15 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
+using System.Text;
 
 namespace Mobiclone.Api
 {
@@ -25,24 +28,62 @@ namespace Mobiclone.Api
 
             services.AddDbContext<MobicloneContext>(options => options.UseSqlServer(connectionString));
 
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<string>("Auth:Secret")));
+
+            var issuer = _configuration.GetValue<string>("Auth:Issuer");
+
+            var audience = _configuration.GetValue<string>("Auth:Audience");
+
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters.ValidIssuer = issuer;
+                    options.TokenValidationParameters.ValidAudience = audience;
+                    options.TokenValidationParameters.IssuerSigningKey = secretKey;
+                    options.TokenValidationParameters.ValidateIssuer = true;
+                    options.TokenValidationParameters.ValidateAudience = true;
+                    options.TokenValidationParameters.ValidateIssuerSigningKey = true;
+                });
+
             services.AddScoped<IHash, Bcrypt>();
 
-            services.AddScoped<IAuth>((provider) => new Jwt(
-                context: provider.GetService<MobicloneContext>(),
-                hash: provider.GetService<IHash>(),
-                issuer: _configuration["Auth:Issuer"],
-                audience: _configuration["Auth:Issuer"],
-                secret: _configuration["Auth:Secret"]
-            ));
+            services.AddScoped<IAuth>((provider) => new Jwt(context: provider.GetService<MobicloneContext>(), hash: provider.GetService<IHash>(), issuer, audience, secretKey));
 
-            services.AddControllers();
+            services.AddMvc(options => options.EnableEndpointRouting = false);
 
-            services.AddSwaggerGen(setup => setup.SwaggerDoc("v1", new OpenApiInfo
+            services.AddSwaggerGen(options =>
             {
-                Title = "Mobiclone",
-                Description = "Mobiclone",
-                Version = "v1"
-            }));
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Mobiclone",
+                    Description = "Mobiclone",
+                    Version = "v1"
+                });
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header using the Bearer scheme",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -52,6 +93,10 @@ namespace Mobiclone.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseAuthentication();
+
+            app.UseMvcWithDefaultRoute();
+
             app.UseSwagger();
 
             app.UseSwaggerUI(setup =>
@@ -59,10 +104,6 @@ namespace Mobiclone.Api
                 setup.SwaggerEndpoint("/swagger/v1/swagger.json", "Mobiclone");
                 setup.RoutePrefix = string.Empty;
             });
-
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
         }
     }
 }
