@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
 using Mobiclone.Api.Controllers;
 using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
 using Mobiclone.Api.ViewModels;
 using Mobiclone.Api.ViewModels.Session;
+using Moq;
 using System;
-using System.Text;
 using Xunit;
 
 namespace Mobiclone.Test.Integration
@@ -22,18 +23,22 @@ namespace Mobiclone.Test.Integration
         {
             var builder = new DbContextOptionsBuilder<MobicloneContext>().UseInMemoryDatabase("session");
 
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("XXXXXXXXXXXXXXXXXXXXXXXX"));
-
             _context = new MobicloneContext(builder.Options);
 
             var hash = new Bcrypt();
 
+            var httpContextAcessor = new Mock<IHttpContextAccessor>();
+
+            var configuration = new Mock<IConfiguration>();
+            configuration.Setup(x => x[It.Is<string>(s => s == "Auth:Issuer")]).Returns("Test");
+            configuration.Setup(x => x[It.Is<string>(s => s == "Auth:Audience")]).Returns("Test");
+            configuration.Setup(x => x[It.Is<string>(s => s == "Auth:Key")]).Returns("XXXXXXXXXXXXXXXXXXXXXXXX");
+
             var auth = new Jwt(
-                context: _context,
-                hash: hash,
-                issuer: "test",
-                audience: "test",
-                secretKey: secretKey
+                _context,
+                hash,
+                configuration.Object,
+                httpContextAcessor.Object
             );
 
             _controller = new SessionController(auth);
@@ -42,7 +47,7 @@ namespace Mobiclone.Test.Integration
         }
 
         [Fact]
-        public async void Should_Return_Status_200()
+        public async void Store_Should_Return_Status_200()
         {
             var user = await Factory.User(email: "flavio@email.com", password: "test");
 
@@ -62,7 +67,7 @@ namespace Mobiclone.Test.Integration
         }
 
         [Fact]
-        public async void Should_Return_A_Jwt_Token()
+        public async void Store_Should_Return_A_Jwt_Token()
         {
             var user = await Factory.User(email: "flavio@email.com", password: "test");
 

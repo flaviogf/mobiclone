@@ -1,9 +1,14 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Mobiclone.Api.Database;
+using Mobiclone.Api.Models;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Mobiclone.Api.Lib
@@ -13,45 +18,59 @@ namespace Mobiclone.Api.Lib
         private readonly MobicloneContext _context;
 
         private readonly IHash _hash;
+        private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _accessor;
 
-        private readonly string _issuer;
-
-        private readonly string _audience;
-
-        private readonly SecurityKey _secretKey;
-
-        public Jwt(MobicloneContext context, IHash hash, string issuer, string audience, SecurityKey secretKey)
+        public Jwt(MobicloneContext context, IHash hash, IConfiguration configuration, IHttpContextAccessor accessor)
         {
             _context = context;
             _hash = hash;
-            _issuer = issuer;
-            _audience = audience;
-            _secretKey = secretKey;
+            _configuration = configuration;
+            _accessor = accessor;
         }
 
         public async Task<string> Attempt(string email, string password)
         {
-            var user = _context.Users.FirstOrDefault(it => it.Email == email);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Key"]));
+
+            var issuer = _configuration["Auth:Issuer"];
+
+            var audience = _configuration["Auth:Audience"];
+
+            var user = await (from u in _context.Users
+                              where u.Email == email
+                              select u).FirstOrDefaultAsync();
 
             if (user == null || !(await _hash.Verify(password, user.PasswordHash)))
             {
                 return null;
             }
 
-            var credentials = new SigningCredentials(_secretKey, SecurityAlgorithms.HmacSha256);
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new Claim[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString())
             };
 
-            var token = new JwtSecurityToken(issuer: _issuer, audience: _audience, claims: claims, signingCredentials: credentials, expires: DateTime.Now.AddMinutes(1));
+            var token = new JwtSecurityToken(issuer, audience, claims, signingCredentials: credentials, expires: DateTime.Now.AddMinutes(1));
 
             var handler = new JwtSecurityTokenHandler();
 
             var raw = handler.WriteToken(token);
 
             return raw;
+        }
+
+        public async Task<User> User()
+        {
+            int.TryParse(_accessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value, out var id);
+
+            var user = await (from u in _context.Users
+                              where u.Id == id
+                              select u).FirstOrDefaultAsync();
+
+            return user;
         }
     }
 }

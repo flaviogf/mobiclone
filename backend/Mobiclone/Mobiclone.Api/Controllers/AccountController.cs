@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Mobiclone.Api.Lib;
 using System.Threading.Tasks;
 
 namespace Mobiclone.Api.Controllers
@@ -10,6 +11,13 @@ namespace Mobiclone.Api.Controllers
     [Authorize]
     public class AccountController : Controller
     {
+        private IAuth _auth;
+
+        public AccountController(IAuth auth)
+        {
+            _auth = auth;
+        }
+
         [HttpPost]
         [Route("")]
         [Produces("application/json")]
@@ -19,7 +27,7 @@ namespace Mobiclone.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Store()
         {
-            return Ok();
+            return Ok(await _auth.User());
         }
     }
 }

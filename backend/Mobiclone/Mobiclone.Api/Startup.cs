@@ -28,11 +28,13 @@ namespace Mobiclone.Api
 
             services.AddDbContext<MobicloneContext>(options => options.UseSqlServer(connectionString));
 
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<string>("Auth:Secret")));
+            services.AddHttpContextAccessor();
 
-            var issuer = _configuration.GetValue<string>("Auth:Issuer");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Auth:Key"]));
 
-            var audience = _configuration.GetValue<string>("Auth:Audience");
+            var issuer = _configuration["Auth:Issuer"];
+
+            var audience = _configuration["Auth:Audience"];
 
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -40,7 +42,7 @@ namespace Mobiclone.Api
                 {
                     options.TokenValidationParameters.ValidIssuer = issuer;
                     options.TokenValidationParameters.ValidAudience = audience;
-                    options.TokenValidationParameters.IssuerSigningKey = secretKey;
+                    options.TokenValidationParameters.IssuerSigningKey = key;
                     options.TokenValidationParameters.ValidateIssuer = true;
                     options.TokenValidationParameters.ValidateAudience = true;
                     options.TokenValidationParameters.ValidateIssuerSigningKey = true;
@@ -48,7 +50,7 @@ namespace Mobiclone.Api
 
             services.AddScoped<IHash, Bcrypt>();
 
-            services.AddScoped<IAuth>((provider) => new Jwt(context: provider.GetService<MobicloneContext>(), hash: provider.GetService<IHash>(), issuer, audience, secretKey));
+            services.AddScoped<IAuth, Jwt>();
 
             services.AddMvc(options => options.EnableEndpointRouting = false);
 

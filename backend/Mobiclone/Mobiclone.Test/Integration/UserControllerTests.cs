@@ -29,7 +29,7 @@ namespace Mobiclone.Test.Integration
         }
 
         [Fact]
-        public async void Should_Return_Status_201()
+        public async void Store_Should_Return_Status_201()
         {
             var viewModel = new StoreUserViewModel
             {
@@ -44,7 +44,7 @@ namespace Mobiclone.Test.Integration
         }
 
         [Fact]
-        public async void Should_Exist_A_User_Into_Database()
+        public async void Store_Should_Exist_A_User_Into_Database()
         {
             var viewModel = new StoreUserViewModel
             {
