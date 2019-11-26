@@ -11,7 +11,7 @@ namespace Mobiclone.Api.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        private IAuth _auth;
+        private readonly IAuth _auth;
 
         public AccountController(IAuth auth)
         {
