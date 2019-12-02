@@ -7,7 +7,6 @@ using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
 using Mobiclone.Api.ViewModels;
 using Mobiclone.Api.ViewModels.Session;
-using Moq;
 using System;
 using Xunit;
 
@@ -27,18 +26,15 @@ namespace Mobiclone.Test.Integration
 
             var hash = new Bcrypt();
 
-            var httpContextAcessor = new Mock<IHttpContextAccessor>();
+            var httpContextAcessor = new HttpContextAccessor();
 
-            var configuration = new Mock<IConfiguration>();
-            configuration.Setup(x => x[It.Is<string>(s => s == "Auth:Issuer")]).Returns("Test");
-            configuration.Setup(x => x[It.Is<string>(s => s == "Auth:Audience")]).Returns("Test");
-            configuration.Setup(x => x[It.Is<string>(s => s == "Auth:Key")]).Returns("XXXXXXXXXXXXXXXXXXXXXXXX");
+            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Test.json").Build();
 
             var auth = new Jwt(
                 _context,
                 hash,
-                configuration.Object,
-                httpContextAcessor.Object
+                configuration,
+                httpContextAcessor
             );
 
             _controller = new SessionController(auth);
