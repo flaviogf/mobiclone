@@ -7,20 +7,40 @@ namespace Mobiclone.Test
 {
     public class Factory
     {
+        private static readonly Faker _faker = new Faker();
+
+        private static readonly IHash _hash = new Bcrypt();
+
         public async static Task<User> User(string name = null, string email = null, string password = null)
         {
-            var faker = new Faker();
-
-            var bcrypt = new Bcrypt();
+            var _name = name ?? _faker.Person.FirstName;
+            var _email = email ?? _faker.Person.Email;
+            var _password = password ?? _faker.Internet.Password();
 
             var user = new User
             {
-                Name = name ?? faker.Person.FirstName,
-                Email = email ?? faker.Person.Email,
-                PasswordHash = password != null ? await bcrypt.Make(password) : await bcrypt.Make(faker.Internet.Password())
+                Name = _name,
+                Email = _email,
+                PasswordHash = await _hash.Make(_password)
             };
 
             return user;
+        }
+
+        public static Task<Account> Account(string name = null, string type = null, int? userId = null)
+        {
+            var _name = name ?? _faker.Finance.Account();
+            var _type = type ?? _faker.Finance.AccountName();
+            var _userId = userId ?? 1;
+
+            Account account = new Account
+            {
+                Name = _name,
+                Type = _type,
+                UserId = _userId
+            };
+
+            return Task.FromResult(account);
         }
     }
 }

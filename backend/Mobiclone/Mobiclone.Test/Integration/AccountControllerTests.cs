@@ -5,8 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Mobiclone.Api.Controllers;
 using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
+using Mobiclone.Api.Models;
+using Mobiclone.Api.ViewModels;
 using Mobiclone.Api.ViewModels.Account;
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using Xunit;
 
@@ -108,6 +111,70 @@ namespace Mobiclone.Test.Integration
                     Assert.Equal(viewModel.Name, account.Name);
                     Assert.Equal(viewModel.Type, account.Type);
                     Assert.Equal(user.Id, account.UserId);
+                });
+        }
+
+        [Fact]
+        public async void Index_Should_Return_Status_200()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var result = await _controller.Index();
+
+            Assert.IsAssignableFrom<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Index_Should_Return_A_List_Of_Account()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var result = await _controller.Index();
+
+            var response = Assert.IsAssignableFrom<OkObjectResult>(result);
+
+            Assert.Collection(((ResponseViewModel<List<Account>>)response.Value).Data,
+                (it) =>
+                {
+                    Assert.Equal(account.Id, it.Id);
                 });
         }
 

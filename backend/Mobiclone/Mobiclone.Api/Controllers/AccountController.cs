@@ -6,6 +6,8 @@ using Mobiclone.Api.Lib;
 using Mobiclone.Api.Models;
 using Mobiclone.Api.ViewModels;
 using Mobiclone.Api.ViewModels.Account;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Mobiclone.Api.Controllers
@@ -50,6 +52,25 @@ namespace Mobiclone.Api.Controllers
             var response = new ResponseViewModel<int>(account.Id);
 
             return Created($"/account/{account.Id}", response);
+        }
+
+        [HttpGet]
+        [Route("")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Index()
+        {
+            var user = await _auth.User();
+
+            var accounts = from account in _context.Accounts.AsParallel()
+                           where account.UserId == user.Id
+                           select account;
+
+            var response = new ResponseViewModel<List<Account>>(accounts.ToList());
+
+            return Ok(response);
         }
     }
 }
