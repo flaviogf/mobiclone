@@ -178,6 +178,79 @@ namespace Mobiclone.Test.Integration
                 });
         }
 
+        [Fact]
+        public async void Update_Should_Return_Status_200()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var viewModel = new UpdateAccountViewModel
+            {
+                Name = "Itaú",
+                Type = "Poupança"
+            };
+
+            var result = await _controller.Update(account.Id, viewModel);
+
+            Assert.IsAssignableFrom<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Update_Should_Account_Has_Been_Updated()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var viewModel = new UpdateAccountViewModel
+            {
+                Name = "Itaú",
+                Type = "Corrente"
+            };
+
+            _context.Entry(account).Reload();
+
+            await _controller.Update(account.Id, viewModel);
+
+            Assert.Equal(viewModel.Name, account.Name);
+            Assert.Equal(viewModel.Type, account.Type);
+        }
+
         public void Dispose()
         {
             _context.Database.EnsureDeleted();

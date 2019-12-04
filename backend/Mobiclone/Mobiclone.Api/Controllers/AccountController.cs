@@ -72,5 +72,30 @@ namespace Mobiclone.Api.Controllers
 
             return Ok(response);
         }
+
+        [HttpPost]
+        [Route("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateAccountViewModel viewModel)
+        {
+            var user = await _auth.User();
+
+            var current = (from account in _context.Accounts.AsParallel()
+                           where account.Id == id && account.UserId == user.Id
+                           select account).FirstOrDefault();
+
+            current.Name = viewModel.Name;
+            current.Type = viewModel.Type;
+
+            await _context.SaveChangesAsync();
+
+            var response = new ResponseViewModel<int>(current.Id);
+
+            return Ok(response);
+        }
     }
 }
