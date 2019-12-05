@@ -179,6 +179,64 @@ namespace Mobiclone.Test.Integration
         }
 
         [Fact]
+        public async void Show_Should_Return_Status_200()
+        {
+            var user = await Factory.User();
+
+            await _context.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.AddAsync(account);
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var result = await _controller.Show(account.Id);
+
+            Assert.IsAssignableFrom<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Show_Should_Return_Account()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var result = await _controller.Show(account.Id);
+
+            var response = Assert.IsAssignableFrom<OkObjectResult>(result);
+
+            Assert.Equal(((ResponseViewModel<Account>)response.Value).Data.Id, account.Id);
+        }
+
+        [Fact]
         public async void Update_Should_Return_Status_200()
         {
             var user = await Factory.User();

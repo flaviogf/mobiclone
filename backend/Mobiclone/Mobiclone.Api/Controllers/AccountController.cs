@@ -73,7 +73,26 @@ namespace Mobiclone.Api.Controllers
             return Ok(response);
         }
 
-        [HttpPost]
+        [HttpGet]
+        [Route("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Show([FromRoute]int id)
+        {
+            var user = await _auth.User();
+
+            var account = (from current in _context.Accounts.AsParallel()
+                           where current.Id == id && current.UserId == user.Id
+                           select current).FirstOrDefault();
+
+            var response = new ResponseViewModel<Account>(account);
+
+            return Ok(response);
+        }
+
+        [HttpPut]
         [Route("{id}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -84,16 +103,16 @@ namespace Mobiclone.Api.Controllers
         {
             var user = await _auth.User();
 
-            var current = (from account in _context.Accounts.AsParallel()
-                           where account.Id == id && account.UserId == user.Id
-                           select account).FirstOrDefault();
+            var account = (from current in _context.Accounts.AsParallel()
+                           where current.Id == id && current.UserId == user.Id
+                           select current).FirstOrDefault();
 
-            current.Name = viewModel.Name;
-            current.Type = viewModel.Type;
+            account.Name = viewModel.Name;
+            account.Type = viewModel.Type;
 
             await _context.SaveChangesAsync();
 
-            var response = new ResponseViewModel<int>(current.Id);
+            var response = new ResponseViewModel<int>(account.Id);
 
             return Ok(response);
         }
