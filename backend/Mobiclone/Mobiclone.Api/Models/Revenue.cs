@@ -17,7 +17,6 @@ namespace Mobiclone.Api.Models
         [Required]
         public int Value { get; set; }
 
-        [Timestamp]
         [Required]
         public DateTime Date { get; set; }
 
