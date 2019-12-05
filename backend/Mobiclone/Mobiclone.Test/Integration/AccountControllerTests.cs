@@ -189,6 +189,8 @@ namespace Mobiclone.Test.Integration
 
             await _context.AddAsync(account);
 
+            await _context.SaveChangesAsync();
+
             _accessor.HttpContext.User = new ClaimsPrincipal
             (
                 new ClaimsIdentity
@@ -307,6 +309,64 @@ namespace Mobiclone.Test.Integration
 
             Assert.Equal(viewModel.Name, account.Name);
             Assert.Equal(viewModel.Type, account.Type);
+        }
+
+        [Fact]
+        public async void Destroy_Should_Return_Status_200()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var result = await _controller.Destroy(account.Id);
+
+            Assert.IsAssignableFrom<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Destroy_Should_Not_Exist_Account_Into_Database()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            await _controller.Destroy(account.Id);
+
+            Assert.Empty(_context.Accounts);
         }
 
         public void Dispose()

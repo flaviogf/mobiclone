@@ -85,7 +85,7 @@ namespace Mobiclone.Api.Controllers
 
             var account = (from current in _context.Accounts.AsParallel()
                            where current.Id == id && current.UserId == user.Id
-                           select current).FirstOrDefault();
+                           select current).First();
 
             var response = new ResponseViewModel<Account>(account);
 
@@ -105,10 +105,33 @@ namespace Mobiclone.Api.Controllers
 
             var account = (from current in _context.Accounts.AsParallel()
                            where current.Id == id && current.UserId == user.Id
-                           select current).FirstOrDefault();
+                           select current).First();
 
             account.Name = viewModel.Name;
             account.Type = viewModel.Type;
+
+            await _context.SaveChangesAsync();
+
+            var response = new ResponseViewModel<int>(account.Id);
+
+            return Ok(response);
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Destroy([FromRoute]int id)
+        {
+            var user = await _auth.User();
+
+            var account = (from current in _context.Accounts.AsParallel()
+                           where current.Id == id && current.UserId == user.Id
+                           select current).First();
+
+            _context.Remove(account);
 
             await _context.SaveChangesAsync();
 
