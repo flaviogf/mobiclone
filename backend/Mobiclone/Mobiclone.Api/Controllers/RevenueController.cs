@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Mobiclone.Api.Controllers
 {
     [ApiController]
-    [Route("account/{accountId}")]
+    [Route("account/{accountId}/revenue")]
     [Authorize]
     public class RevenueController : Controller
     {
