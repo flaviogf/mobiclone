@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using Mobiclone.Api.Lib;
 using Mobiclone.Api.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace Mobiclone.Test
@@ -33,7 +34,7 @@ namespace Mobiclone.Test
             var _type = type ?? _faker.Finance.AccountName();
             var _userId = userId ?? 1;
 
-            Account account = new Account
+            var account = new Account
             {
                 Name = _name,
                 Type = _type,
@@ -41,6 +42,24 @@ namespace Mobiclone.Test
             };
 
             return Task.FromResult(account);
+        }
+
+        public static Task<Revenue> Revenue(string description = null, int? value = null, DateTime? date = null, int? accountId = null)
+        {
+            var _description = description ?? _faker.Lorem.Sentence();
+            var _value = value ?? _faker.Random.Int();
+            var _date = date ?? _faker.Date.Recent();
+            var _accountId = accountId ?? 1;
+
+            var revenue = new Revenue
+            {
+                Description = _description,
+                Value = _value,
+                Date = _date,
+                AccountId = _accountId
+            };
+
+            return Task.FromResult(revenue);
         }
     }
 }

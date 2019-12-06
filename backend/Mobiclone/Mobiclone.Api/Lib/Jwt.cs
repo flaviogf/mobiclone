@@ -39,7 +39,7 @@ namespace Mobiclone.Api.Lib
 
             var user = await (from u in _context.Users
                               where u.Email == email
-                              select u).FirstOrDefaultAsync();
+                              select u).FirstAsync();
 
             if (user == null || !(await _hash.Verify(password, user.PasswordHash)))
             {
@@ -68,7 +68,7 @@ namespace Mobiclone.Api.Lib
 
             var user = await (from u in _context.Users
                               where u.Id == id
-                              select u).FirstOrDefaultAsync();
+                              select u).FirstAsync();
 
             return user;
         }

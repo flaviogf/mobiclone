@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
 using Mobiclone.Api.Models;
@@ -64,7 +65,7 @@ namespace Mobiclone.Api.Controllers
         {
             var user = await _auth.User();
 
-            var accounts = from account in _context.Accounts.AsParallel()
+            var accounts = from account in _context.Accounts
                            where account.UserId == user.Id
                            select account;
 
@@ -83,9 +84,9 @@ namespace Mobiclone.Api.Controllers
         {
             var user = await _auth.User();
 
-            var account = (from current in _context.Accounts.AsParallel()
-                           where current.Id == id && current.UserId == user.Id
-                           select current).First();
+            var account = await (from current in _context.Accounts
+                                 where current.Id == id && current.UserId == user.Id
+                                 select current).FirstAsync();
 
             var response = new ResponseViewModel<Account>(account);
 
@@ -103,9 +104,9 @@ namespace Mobiclone.Api.Controllers
         {
             var user = await _auth.User();
 
-            var account = (from current in _context.Accounts.AsParallel()
-                           where current.Id == id && current.UserId == user.Id
-                           select current).First();
+            var account = await (from current in _context.Accounts
+                                 where current.Id == id && current.UserId == user.Id
+                                 select current).FirstAsync();
 
             account.Name = viewModel.Name;
             account.Type = viewModel.Type;
@@ -127,9 +128,9 @@ namespace Mobiclone.Api.Controllers
         {
             var user = await _auth.User();
 
-            var account = (from current in _context.Accounts.AsParallel()
-                           where current.Id == id && current.UserId == user.Id
-                           select current).First();
+            var account = await (from current in _context.Accounts
+                                 where current.Id == id && current.UserId == user.Id
+                                 select current).FirstAsync();
 
             _context.Remove(account);
 

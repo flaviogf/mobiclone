@@ -5,8 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Mobiclone.Api.Controllers;
 using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
+using Mobiclone.Api.Models;
+using Mobiclone.Api.ViewModels;
 using Mobiclone.Api.ViewModels.Revenue;
 using System;
+using System.Security.Claims;
 using Xunit;
 
 namespace Mobiclone.Test.Integration
@@ -14,6 +17,8 @@ namespace Mobiclone.Test.Integration
     public class RevenueControllerTests : IDisposable
     {
         private readonly MobicloneContext _context;
+
+        private readonly HttpContextAccessor _accessor;
 
         private readonly RevenueController _controller;
 
@@ -27,12 +32,12 @@ namespace Mobiclone.Test.Integration
 
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Test.json").Build();
 
-            var accessor = new HttpContextAccessor
+            _accessor = new HttpContextAccessor
             {
                 HttpContext = new DefaultHttpContext()
             };
 
-            var auth = new Jwt(_context, hash, configuration, accessor);
+            var auth = new Jwt(_context, hash, configuration, _accessor);
 
             _controller = new RevenueController(_context, auth);
 
@@ -51,6 +56,17 @@ namespace Mobiclone.Test.Integration
             await _context.Accounts.AddAsync(account);
 
             await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
 
             var viewModel = new StoreRevenueViewModel
             {
@@ -77,6 +93,17 @@ namespace Mobiclone.Test.Integration
 
             await _context.SaveChangesAsync();
 
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
             var viewModel = new StoreRevenueViewModel
             {
                 Description = "Supermarket",
@@ -93,6 +120,74 @@ namespace Mobiclone.Test.Integration
                     Assert.Equal(viewModel.Value, it.Value);
                     Assert.Equal(viewModel.Date, it.Date);
                 });
+        }
+
+        [Fact]
+        public async void Show_Should_Return_Status_200()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            var revenue = await Factory.Revenue(accountId: account.Id);
+
+            await _context.Revenues.AddAsync(revenue);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var result = await _controller.Show(account.Id, revenue.Id);
+
+            Assert.IsAssignableFrom<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Show_Should_Return_Revenue()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            var revenue = await Factory.Revenue(accountId: account.Id);
+
+            await _context.Revenues.AddAsync(revenue);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var result = await _controller.Show(account.Id, revenue.Id);
+
+            var response = Assert.IsAssignableFrom<OkObjectResult>(result);
+
+            Assert.Equal(((ResponseViewModel<Revenue>)response.Value).Data.Id, revenue.Id);
         }
 
         public void Dispose()
