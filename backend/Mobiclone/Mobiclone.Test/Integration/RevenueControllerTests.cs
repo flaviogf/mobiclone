@@ -190,6 +190,90 @@ namespace Mobiclone.Test.Integration
             Assert.Equal(((ResponseViewModel<Revenue>)response.Value).Data.Id, revenue.Id);
         }
 
+        [Fact]
+        public async void Update_Should_Return_Status_200()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            var revenue = await Factory.Revenue(accountId: account.Id);
+
+            await _context.Revenues.AddAsync(revenue);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var viewModel = new UpdateRevenueViewModel
+            {
+                Description = "Supermarket",
+                Value = 5000,
+                Date = DateTime.Now.AddDays(-1)
+            };
+
+            var result = await _controller.Update(account.Id, revenue.Id, viewModel);
+
+            Assert.IsAssignableFrom<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Update_Should_Revenue_Has_Been_Updated()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            var revenue = await Factory.Revenue(accountId: account.Id);
+
+            await _context.Revenues.AddAsync(revenue);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var viewModel = new UpdateRevenueViewModel
+            {
+                Description = "Supermarket",
+                Value = 5000,
+                Date = DateTime.Now.AddDays(-1)
+            };
+
+            await _controller.Update(account.Id, revenue.Id, viewModel);
+
+            await _context.Entry(revenue).ReloadAsync();
+
+            Assert.Equal(viewModel.Description, revenue.Description);
+            Assert.Equal(viewModel.Value, revenue.Value);
+            Assert.Equal(viewModel.Date, revenue.Date);
+        }
+
         public void Dispose()
         {
             _context.Database.EnsureDeleted();
