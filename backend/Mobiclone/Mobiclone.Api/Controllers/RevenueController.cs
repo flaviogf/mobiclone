@@ -103,5 +103,26 @@ namespace Mobiclone.Api.Controllers
 
             return Ok(response);
         }
+
+        [HttpDelete]
+        [Route("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Destroy([FromRoute] int accountId, [FromRoute] int id)
+        {
+            var user = await _auth.User();
+
+            var revenue = await (from current in _context.Revenues
+                                 where current.AccountId == accountId && current.Id == id
+                                 select current).FirstAsync();
+
+            _context.Remove(revenue);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(revenue);
+        }
     }
 }
