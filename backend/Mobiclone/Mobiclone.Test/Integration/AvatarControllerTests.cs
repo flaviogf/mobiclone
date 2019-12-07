@@ -1,27 +1,67 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Mobiclone.Api.Controllers;
+using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
 using System.IO;
+using System.Security.Claims;
 using Xunit;
 
 namespace Mobiclone.Test.Integration
 {
     public class AvatarControllerTests
     {
-        [Fact]
-        public async void Store_Should_Return_Status_201()
+        private readonly MobicloneContext _context;
+
+        private readonly HttpContextAccessor _accessor;
+
+        private readonly AvatarController _controller;
+
+        public AvatarControllerTests()
         {
+            var builder = new DbContextOptionsBuilder<MobicloneContext>().UseInMemoryDatabase("avatar");
+
+            _context = new MobicloneContext(builder.Options);
+
+            var hash = new Bcrypt();
+
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Test.json").Build();
+
+            _accessor = new HttpContextAccessor
+            {
+                HttpContext = new DefaultHttpContext()
+            };
+
+            var auth = new Jwt(_context, hash, configuration, _accessor);
 
             var storage = new DiskStorage(configuration);
 
-            var controller = new AvatarController(storage);
+            _controller = new AvatarController(_context, auth, storage);
+        }
 
-            var directory = Directory.GetCurrentDirectory();
+        [Fact]
+        public async void Store_Should_Return_Status_201()
+        {
+            var user = await Factory.User();
 
-            var filePath = Path.Join(directory, "Fixtures", "avatar.png");
+            await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var filePath = Path.Join(Directory.GetCurrentDirectory(), "Fixtures", "avatar.png");
 
             using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
 
@@ -32,9 +72,53 @@ namespace Mobiclone.Test.Integration
                 ContentType = "image/png",
             };
 
-            var result = await controller.Store(fileForm);
+            var result = await _controller.Store(fileForm);
 
             Assert.IsAssignableFrom<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Should_Exist_A_File()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var filePath = Path.Join(Directory.GetCurrentDirectory(), "Fixtures", "avatar.png");
+
+            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+
+            var fileForm = new FormFile(fileStream, 0, fileStream.Length, "file", "avatar.png")
+            {
+                Headers = new HeaderDictionary(),
+                ContentDisposition = "form-data; name=\"file\"; filename=\"avatar.png\"",
+                ContentType = "image/png",
+            };
+
+            await _controller.Store(fileForm);
+
+            await _context.Entry(user).ReloadAsync();
+
+            Assert.Collection(_context.Files,
+                (it) =>
+                {
+                    Assert.Equal(fileForm.FileName, it.Name);
+                    Assert.NotNull(it.Path);
+                    Assert.Equal(it.Id, user.FileId);
+                });
         }
     }
 }

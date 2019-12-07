@@ -15,17 +15,17 @@ namespace Mobiclone.Api.Lib
             _configuration = configuration;
         }
 
-        public async Task<string> Move(IFormFile file)
+        public async Task<string> Move(IFormFile fileForm)
         {
             var storagePath = _configuration["Storage:Path"];
 
-            var fileName = $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}-{file.FileName}";
+            var fileName = $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}-{fileForm.FileName}";
 
             var filePath = Path.Join(storagePath, fileName);
 
             using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
 
-            await file.CopyToAsync(fileStream);
+            await fileForm.CopyToAsync(fileStream);
 
             return fileName;
         }
