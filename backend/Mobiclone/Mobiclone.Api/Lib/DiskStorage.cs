@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +19,7 @@ namespace Mobiclone.Api.Lib
         {
             var storagePath = _configuration["Storage:Path"];
 
-            var fileName = $"{Path.GetRandomFileName()}{Path.GetExtension(file.FileName)}";
+            var fileName = $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}-{file.FileName}";
 
             var filePath = Path.Join(storagePath, fileName);
 
