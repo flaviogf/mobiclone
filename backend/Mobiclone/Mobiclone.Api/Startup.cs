@@ -52,6 +52,8 @@ namespace Mobiclone.Api
 
             services.AddScoped<IAuth, Jwt>();
 
+            services.AddScoped<IStorage, DiskStorage>();
+
             services.AddMvc(options => options.EnableEndpointRouting = false);
 
             services.AddSwaggerGen(options =>
