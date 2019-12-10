@@ -58,5 +58,24 @@ namespace Mobiclone.Api.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet]
+        [Route("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Show(int accountId, int id)
+        {
+            var user = await _auth.User();
+
+            var expense = await (from current in _context.Expenses
+                                 where current.AccountId == accountId && current.Id == id
+                                 select current).FirstAsync();
+
+            var response = new ResponseViewModel<Expense>(expense);
+
+            return Ok(response);
+        }
     }
 }

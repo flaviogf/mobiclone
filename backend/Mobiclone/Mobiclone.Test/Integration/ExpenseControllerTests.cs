@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Mobiclone.Api.Controllers;
 using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
+using Mobiclone.Api.Models;
+using Mobiclone.Api.ViewModels;
 using Mobiclone.Api.ViewModels.Expense;
 using System;
 using System.Security.Claims;
@@ -116,6 +118,74 @@ namespace Mobiclone.Test.Integration
                     Assert.Equal(viewModel.Value, it.Value);
                     Assert.Equal(viewModel.Date, it.Date);
                 });
+        }
+
+        [Fact]
+        public async void Show_Should_Return_Status_200()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            var expense = await Factory.Expense();
+
+            await _context.Expenses.AddAsync(expense);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var result = await _controller.Show(account.Id, expense.Id);
+
+            Assert.IsAssignableFrom<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Show_Should_Return_Expense()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            var expense = await Factory.Expense();
+
+            await _context.Expenses.AddAsync(expense);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var result = await _controller.Show(account.Id, expense.Id);
+
+            var response = Assert.IsAssignableFrom<OkObjectResult>(result);
+
+            Assert.Equal(((ResponseViewModel<Expense>)response.Value).Data.Id, expense.Id);
         }
 
         public void Dispose()

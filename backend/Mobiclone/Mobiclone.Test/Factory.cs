@@ -61,5 +61,23 @@ namespace Mobiclone.Test
 
             return Task.FromResult(revenue);
         }
+
+        public static Task<Expense> Expense(string description = null, int? value = null, DateTime? date = null, int? accountId = null)
+        {
+            var _description = description ?? _faker.Lorem.Sentence();
+            var _value = value ?? _faker.Random.Int();
+            var _date = date ?? _faker.Date.Recent();
+            var _accountId = accountId ?? 1;
+
+            var expense = new Expense
+            {
+                Description = _description,
+                Value = _value,
+                Date = _date,
+                AccountId = _accountId
+            };
+
+            return Task.FromResult(expense);
+        }
     }
 }
