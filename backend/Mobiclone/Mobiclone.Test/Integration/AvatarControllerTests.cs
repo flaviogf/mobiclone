@@ -5,13 +5,14 @@ using Microsoft.Extensions.Configuration;
 using Mobiclone.Api.Controllers;
 using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
+using System;
 using System.IO;
 using System.Security.Claims;
 using Xunit;
 
 namespace Mobiclone.Test.Integration
 {
-    public class AvatarControllerTests
+    public class AvatarControllerTests : IDisposable
     {
         private readonly MobicloneContext _context;
 
@@ -119,6 +120,11 @@ namespace Mobiclone.Test.Integration
                     Assert.NotNull(it.Path);
                     Assert.Equal(it.Id, user.FileId);
                 });
+        }
+
+        public void Dispose()
+        {
+            _context.Database.EnsureDeleted();
         }
     }
 }

@@ -70,7 +70,8 @@ namespace Mobiclone.Api.Controllers
             var user = await _auth.User();
 
             var revenue = await (from current in _context.Revenues
-                                 where current.AccountId == accountId && current.Id == id
+                                 join account in _context.Accounts on current.AccountId equals account.Id
+                                 where current.AccountId == accountId && current.Id == id && account.UserId == user.Id
                                  select current).FirstAsync();
 
             var response = new ResponseViewModel<Revenue>(revenue);
@@ -90,7 +91,8 @@ namespace Mobiclone.Api.Controllers
             var user = await _auth.User();
 
             var revenue = await (from current in _context.Revenues
-                                 where current.AccountId == accountId && current.Id == id
+                                 join account in _context.Accounts on current.AccountId equals account.Id
+                                 where current.AccountId == accountId && current.Id == id && account.UserId == user.Id
                                  select current).FirstAsync();
 
             revenue.Description = viewModel.Description;
@@ -115,7 +117,8 @@ namespace Mobiclone.Api.Controllers
             var user = await _auth.User();
 
             var revenue = await (from current in _context.Revenues
-                                 where current.AccountId == accountId && current.Id == id
+                                 join account in _context.Accounts on current.AccountId equals account.Id
+                                 where current.AccountId == accountId && current.Id == id && account.UserId == user.Id
                                  select current).FirstAsync();
 
             _context.Remove(revenue);

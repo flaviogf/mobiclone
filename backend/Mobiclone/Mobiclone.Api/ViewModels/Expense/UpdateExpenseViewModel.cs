@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Mobiclone.Api.ViewModels.Expense
 {
-    public class StoreExpenseViewModel
+    public class UpdateExpenseViewModel
     {
         [StringLength(255)]
         [Required]

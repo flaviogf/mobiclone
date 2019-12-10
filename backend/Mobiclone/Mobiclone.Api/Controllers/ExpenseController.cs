@@ -70,10 +70,38 @@ namespace Mobiclone.Api.Controllers
             var user = await _auth.User();
 
             var expense = await (from current in _context.Expenses
-                                 where current.AccountId == accountId && current.Id == id
+                                 join account in _context.Accounts on current.AccountId equals account.Id
+                                 where current.AccountId == accountId && current.Id == id && account.UserId == user.Id
                                  select current).FirstAsync();
 
             var response = new ResponseViewModel<Expense>(expense);
+
+            return Ok(response);
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Update(int accountId, int id, UpdateExpenseViewModel viewModel)
+        {
+            var user = await _auth.User();
+
+            var expense = await (from current in _context.Expenses
+                                 join account in _context.Accounts on current.AccountId equals account.Id
+                                 where current.AccountId == accountId && current.Id == id && account.UserId == user.Id
+                                 select current).FirstAsync();
+
+            expense.Description = viewModel.Description;
+            expense.Value = viewModel.Value;
+            expense.Date = viewModel.Date;
+
+            await _context.SaveChangesAsync();
+
+            var response = new ResponseViewModel<int>(expense.Id);
 
             return Ok(response);
         }

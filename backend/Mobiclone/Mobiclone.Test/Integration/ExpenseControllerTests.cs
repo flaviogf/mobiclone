@@ -131,7 +131,7 @@ namespace Mobiclone.Test.Integration
 
             await _context.Accounts.AddAsync(account);
 
-            var expense = await Factory.Expense();
+            var expense = await Factory.Expense(accountId: account.Id);
 
             await _context.Expenses.AddAsync(expense);
 
@@ -164,7 +164,7 @@ namespace Mobiclone.Test.Integration
 
             await _context.Accounts.AddAsync(account);
 
-            var expense = await Factory.Expense();
+            var expense = await Factory.Expense(accountId: account.Id);
 
             await _context.Expenses.AddAsync(expense);
 
@@ -186,6 +186,90 @@ namespace Mobiclone.Test.Integration
             var response = Assert.IsAssignableFrom<OkObjectResult>(result);
 
             Assert.Equal(((ResponseViewModel<Expense>)response.Value).Data.Id, expense.Id);
+        }
+
+        [Fact]
+        public async void Update_Should_Return_Status_200()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            var expense = await Factory.Expense(accountId: account.Id);
+
+            await _context.Expenses.AddAsync(expense);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var viewModel = new UpdateExpenseViewModel
+            {
+                Description = "Nintendo Switch",
+                Value = 180000,
+                Date = DateTime.Now.AddDays(-1)
+            };
+
+            var result = await _controller.Update(account.Id, expense.Id, viewModel);
+
+            Assert.IsAssignableFrom<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Update_Should_Expense_Has_Been_Updated()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            var expense = await Factory.Expense(accountId: account.Id);
+
+            await _context.Expenses.AddAsync(expense);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var viewModel = new UpdateExpenseViewModel
+            {
+                Description = "Nintendo Switch",
+                Value = 180000,
+                Date = DateTime.Now.AddDays(-1)
+            };
+
+            await _controller.Update(account.Id, expense.Id, viewModel);
+
+            await _context.Entry(expense).ReloadAsync();
+
+            Assert.Equal(viewModel.Description, expense.Description);
+            Assert.Equal(viewModel.Value, expense.Value);
+            Assert.Equal(viewModel.Date, expense.Date);
         }
 
         public void Dispose()
