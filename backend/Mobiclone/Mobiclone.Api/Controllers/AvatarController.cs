@@ -34,7 +34,7 @@ namespace Mobiclone.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Store(IFormFile formFile)
+        public async Task<IActionResult> Store([FromBody] IFormFile formFile)
         {
             var user = await _auth.User();
 

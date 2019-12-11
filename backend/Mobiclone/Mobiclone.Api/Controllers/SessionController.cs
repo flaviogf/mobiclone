@@ -25,7 +25,7 @@ namespace Mobiclone.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Store([FromBody]StoreSessionViewModel viewModel)
+        public async Task<IActionResult> Store([FromBody] StoreSessionViewModel viewModel)
         {
             var token = await _auth.Attempt(viewModel.Email, viewModel.Password);
 

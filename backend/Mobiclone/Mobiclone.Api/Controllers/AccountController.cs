@@ -80,7 +80,7 @@ namespace Mobiclone.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Show([FromRoute]int id)
+        public async Task<IActionResult> Show([FromRoute] int id)
         {
             var user = await _auth.User();
 
@@ -124,7 +124,7 @@ namespace Mobiclone.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Destroy([FromRoute]int id)
+        public async Task<IActionResult> Destroy([FromRoute] int id)
         {
             var user = await _auth.User();
 

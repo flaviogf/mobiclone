@@ -34,7 +34,7 @@ namespace Mobiclone.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Store(int accountId, StoreExpenseViewModel viewModel)
+        public async Task<IActionResult> Store([FromRoute] int accountId, [FromBody] StoreExpenseViewModel viewModel)
         {
             var user = await _auth.User();
 
@@ -65,7 +65,7 @@ namespace Mobiclone.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Show(int accountId, int id)
+        public async Task<IActionResult> Show([FromRoute] int accountId, [FromRoute] int id)
         {
             var user = await _auth.User();
 
@@ -86,7 +86,7 @@ namespace Mobiclone.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Update(int accountId, int id, UpdateExpenseViewModel viewModel)
+        public async Task<IActionResult> Update([FromRoute] int accountId, [FromRoute] int id, [FromBody] UpdateExpenseViewModel viewModel)
         {
             var user = await _auth.User();
 
@@ -98,6 +98,29 @@ namespace Mobiclone.Api.Controllers
             expense.Description = viewModel.Description;
             expense.Value = viewModel.Value;
             expense.Date = viewModel.Date;
+
+            await _context.SaveChangesAsync();
+
+            var response = new ResponseViewModel<int>(expense.Id);
+
+            return Ok(response);
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Destroy([FromRoute] int accountId, [FromRoute] int id)
+        {
+            var user = await _auth.User();
+
+            var expense = await (from current in _context.Expenses
+                                 where current.AccountId == accountId && current.Id == id
+                                 select current).FirstAsync();
+
+            _context.Remove(expense);
 
             await _context.SaveChangesAsync();
 

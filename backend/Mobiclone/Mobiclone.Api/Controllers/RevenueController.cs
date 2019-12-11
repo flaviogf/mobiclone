@@ -34,7 +34,7 @@ namespace Mobiclone.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Store([FromRoute]int accountId, [FromBody]StoreRevenueViewModel viewModel)
+        public async Task<IActionResult> Store([FromRoute] int accountId, [FromBody] StoreRevenueViewModel viewModel)
         {
             var user = await _auth.User();
 

@@ -272,6 +272,72 @@ namespace Mobiclone.Test.Integration
             Assert.Equal(viewModel.Date, expense.Date);
         }
 
+        [Fact]
+        public async void Destroy_Should_Return_Status_200()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            var expense = await Factory.Expense(accountId: account.Id);
+
+            await _context.Expenses.AddAsync(expense);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var result = await _controller.Destroy(account.Id, expense.Id);
+
+            Assert.IsAssignableFrom<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Destory_Should_Not_Exist_Expense_Into_Database()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            var expense = await Factory.Expense(accountId: account.Id);
+
+            await _context.Expenses.AddAsync(expense);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            await _controller.Destroy(account.Id, expense.Id);
+
+            Assert.Empty(_context.Expenses);
+        }
+
         public void Dispose()
         {
             _context.Database.EnsureDeleted();
