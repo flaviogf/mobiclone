@@ -84,6 +84,26 @@ namespace Mobiclone.Test.Integration
             Assert.NotNull(((ResponseViewModel<string>)response.Value).Data);
         }
 
+        [Fact]
+        public async void Store_Should_Return_Status_401_When_The_Password_That_Was_Passed_Is_Wrong()
+        {
+            var user = await Factory.User(email: "flavio@email.com", password: "test");
+
+            await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
+
+            var viewModel = new StoreSessionViewModel
+            {
+                Email = "flavio@email.com",
+                Password = "wrong"
+            };
+
+            var result = await _controller.Store(viewModel);
+
+            Assert.IsAssignableFrom<UnauthorizedResult>(result);
+        }
+
         public void Dispose()
         {
             _context.Database.EnsureDeleted();

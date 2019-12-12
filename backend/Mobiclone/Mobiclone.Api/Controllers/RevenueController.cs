@@ -70,6 +70,9 @@ namespace Mobiclone.Api.Controllers
             var user = await _auth.User();
 
             var revenue = await (from current in _context.Revenues
+                                 .Include(it => it.Account)
+                                 .ThenInclude(it => it.User)
+                                 .ThenInclude(it => it.File)
                                  join account in _context.Accounts on current.AccountId equals account.Id
                                  where current.AccountId == accountId && current.Id == id && account.UserId == user.Id
                                  select current).FirstAsync();

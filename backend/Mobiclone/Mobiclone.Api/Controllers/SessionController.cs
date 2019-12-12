@@ -29,6 +29,11 @@ namespace Mobiclone.Api.Controllers
         {
             var token = await _auth.Attempt(viewModel.Email, viewModel.Password);
 
+            if (token == null)
+            {
+                return Unauthorized();
+            }
+
             var response = new ResponseViewModel<string>(token);
 
             return Ok(response);

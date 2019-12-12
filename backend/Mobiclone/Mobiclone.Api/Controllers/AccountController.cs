@@ -65,11 +65,13 @@ namespace Mobiclone.Api.Controllers
         {
             var user = await _auth.User();
 
-            var accounts = from account in _context.Accounts
-                           where account.UserId == user.Id
-                           select account;
+            var accounts = await (from account in _context.Accounts
+                                  .Include(it => it.User)
+                                  .ThenInclude(it => it.File)
+                                  where account.UserId == user.Id
+                                  select account).ToListAsync();
 
-            var response = new ResponseViewModel<List<Account>>(accounts.ToList());
+            var response = new ResponseViewModel<List<Account>>(accounts);
 
             return Ok(response);
         }
@@ -85,6 +87,8 @@ namespace Mobiclone.Api.Controllers
             var user = await _auth.User();
 
             var account = await (from current in _context.Accounts
+                                 .Include(it => it.User)
+                                 .ThenInclude(it => it.File)
                                  where current.Id == id && current.UserId == user.Id
                                  select current).FirstAsync();
 
