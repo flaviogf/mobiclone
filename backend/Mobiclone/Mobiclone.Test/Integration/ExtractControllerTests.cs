@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Mobiclone.Api.Controllers;
@@ -14,19 +15,25 @@ using Xunit;
 
 namespace Mobiclone.Test.Integration
 {
-    public class TransactionControllerTests : IDisposable
+    public class ExtractControllerTests : IDisposable
     {
+        private readonly SqliteConnection _connection;
+
         private readonly MobicloneContext _context;
 
         private readonly HttpContextAccessor _accessor;
 
-        private readonly TransactionController _controller;
+        private readonly ExtractController _controller;
 
-        public TransactionControllerTests()
+        public ExtractControllerTests()
         {
-            var builder = new DbContextOptionsBuilder<MobicloneContext>().UseInMemoryDatabase("transactions");
+            _connection = new SqliteConnection("Data Source=:memory:");
 
-            _context = new MobicloneContext(builder.Options);
+            _connection.Open();
+
+            var options = new DbContextOptionsBuilder<MobicloneContext>().UseSqlite(_connection).Options;
+
+            _context = new MobicloneContext(options);
 
             _accessor = new HttpContextAccessor
             {
@@ -39,7 +46,11 @@ namespace Mobiclone.Test.Integration
 
             var auth = new Jwt(_context, hash, configuration, _accessor);
 
-            _controller = new TransactionController(_context, auth);
+            var extract = new DapperExtract(_connection, auth);
+
+            _controller = new ExtractController(extract);
+
+            _context.Database.EnsureCreated();
         }
 
         [Fact]
@@ -62,7 +73,11 @@ namespace Mobiclone.Test.Integration
                 )
             );
 
-            var result = await _controller.Index();
+            var begin = new DateTime();
+
+            var end = new DateTime();
+
+            var result = await _controller.Index(begin, end);
 
             Assert.IsAssignableFrom<OkObjectResult>(result);
         }
@@ -74,9 +89,13 @@ namespace Mobiclone.Test.Integration
 
             await _context.Users.AddAsync(user);
 
+            await _context.SaveChangesAsync();
+
             var account = await Factory.Account(userId: user.Id);
 
             await _context.Accounts.AddAsync(account);
+
+            await _context.SaveChangesAsync();
 
             var pay = await Factory.Revenue(accountId: account.Id);
 
@@ -95,11 +114,15 @@ namespace Mobiclone.Test.Integration
                 )
             );
 
-            var result = await _controller.Index();
+            var begin = new DateTime();
+
+            var end = new DateTime();
+
+            var result = await _controller.Index(begin, end);
 
             var response = Assert.IsAssignableFrom<OkObjectResult>(result);
 
-            var transactions = ((ResponseViewModel<IEnumerable<Transaction>>)response.Value).Data;
+            var transactions = ((ResponseViewModel<IList<Transaction>>)response.Value).Data;
 
             Assert.Collection(transactions,
                 (it) =>
@@ -114,6 +137,8 @@ namespace Mobiclone.Test.Integration
         public void Dispose()
         {
             _context.Database.EnsureDeleted();
+
+            _connection.Close();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Mobiclone.Api.Controllers;
@@ -14,6 +15,8 @@ namespace Mobiclone.Test.Integration
 {
     public class AvatarControllerTests : IDisposable
     {
+        private readonly SqliteConnection _connection;
+
         private readonly MobicloneContext _context;
 
         private readonly HttpContextAccessor _accessor;
@@ -22,9 +25,13 @@ namespace Mobiclone.Test.Integration
 
         public AvatarControllerTests()
         {
-            var builder = new DbContextOptionsBuilder<MobicloneContext>().UseInMemoryDatabase("avatar");
+            _connection = new SqliteConnection("Data Source=:memory:");
 
-            _context = new MobicloneContext(builder.Options);
+            _connection.Open();
+
+            var options = new DbContextOptionsBuilder<MobicloneContext>().UseSqlite(_connection).Options;
+
+            _context = new MobicloneContext(options);
 
             var hash = new Bcrypt();
 
@@ -40,6 +47,8 @@ namespace Mobiclone.Test.Integration
             var storage = new DiskStorage(configuration);
 
             _controller = new AvatarController(_context, auth, storage);
+
+            _context.Database.EnsureCreated();
         }
 
         [Fact]
@@ -125,6 +134,8 @@ namespace Mobiclone.Test.Integration
         public void Dispose()
         {
             _context.Database.EnsureDeleted();
+
+            _connection.Close();
         }
     }
 }

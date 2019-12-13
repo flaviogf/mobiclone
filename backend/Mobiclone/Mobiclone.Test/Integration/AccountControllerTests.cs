@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Mobiclone.Api.Controllers;
@@ -17,6 +18,8 @@ namespace Mobiclone.Test.Integration
 {
     public class AccountControllerTests : IDisposable
     {
+        private readonly SqliteConnection _connection;
+
         private readonly MobicloneContext _context;
 
         private readonly HttpContextAccessor _accessor;
@@ -25,9 +28,13 @@ namespace Mobiclone.Test.Integration
 
         public AccountControllerTests()
         {
-            var builder = new DbContextOptionsBuilder<MobicloneContext>().UseInMemoryDatabase("account");
+            _connection = new SqliteConnection("Data Source=:memory:");
 
-            _context = new MobicloneContext(builder.Options);
+            _connection.Open();
+
+            var options = new DbContextOptionsBuilder<MobicloneContext>().UseSqlite(_connection).Options;
+
+            _context = new MobicloneContext(options);
 
             var hash = new Bcrypt();
 
@@ -121,6 +128,8 @@ namespace Mobiclone.Test.Integration
 
             await _context.Users.AddAsync(user);
 
+            await _context.SaveChangesAsync();
+
             var account = await Factory.Account(userId: user.Id);
 
             await _context.Accounts.AddAsync(account);
@@ -149,6 +158,8 @@ namespace Mobiclone.Test.Integration
             var user = await Factory.User();
 
             await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
 
             var account = await Factory.Account(userId: user.Id);
 
@@ -185,6 +196,8 @@ namespace Mobiclone.Test.Integration
 
             await _context.AddAsync(user);
 
+            await _context.SaveChangesAsync();
+
             var account = await Factory.Account(userId: user.Id);
 
             await _context.AddAsync(account);
@@ -213,6 +226,8 @@ namespace Mobiclone.Test.Integration
             var user = await Factory.User();
 
             await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
 
             var account = await Factory.Account(userId: user.Id);
 
@@ -244,6 +259,8 @@ namespace Mobiclone.Test.Integration
             var user = await Factory.User();
 
             await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
 
             var account = await Factory.Account(userId: user.Id);
 
@@ -279,6 +296,8 @@ namespace Mobiclone.Test.Integration
             var user = await Factory.User();
 
             await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
 
             var account = await Factory.Account(userId: user.Id);
 
@@ -318,6 +337,8 @@ namespace Mobiclone.Test.Integration
 
             await _context.Users.AddAsync(user);
 
+            await _context.SaveChangesAsync();
+
             var account = await Factory.Account(userId: user.Id);
 
             await _context.Accounts.AddAsync(account);
@@ -347,6 +368,8 @@ namespace Mobiclone.Test.Integration
 
             await _context.Users.AddAsync(user);
 
+            await _context.SaveChangesAsync();
+
             var account = await Factory.Account(userId: user.Id);
 
             await _context.Accounts.AddAsync(account);
@@ -372,6 +395,8 @@ namespace Mobiclone.Test.Integration
         public void Dispose()
         {
             _context.Database.EnsureDeleted();
+
+            _connection.Close();
         }
     }
 }
