@@ -46,7 +46,7 @@ namespace Mobiclone.Test.Integration
 
             var auth = new Jwt(_context, hash, configuration, _accessor);
 
-            var extract = new DapperExtract(_connection, auth);
+            var extract = new DatabaseExtract(_connection, auth);
 
             _controller = new ExtractController(extract);
 

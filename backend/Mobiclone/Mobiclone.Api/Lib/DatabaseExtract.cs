@@ -7,13 +7,13 @@ using Mobiclone.Api.Models;
 
 namespace Mobiclone.Api.Lib
 {
-    public class DapperExtract : IExtract
+    public class DatabaseExtract : IExtract
     {
         private readonly IDbConnection _connection;
 
         private readonly IAuth _auth;
 
-        public DapperExtract(IDbConnection connection, IAuth auth)
+        public DatabaseExtract(IDbConnection connection, IAuth auth)
         {
             _connection = connection;
             _auth = auth;
