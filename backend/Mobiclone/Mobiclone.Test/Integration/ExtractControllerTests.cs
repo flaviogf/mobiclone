@@ -46,7 +46,7 @@ namespace Mobiclone.Test.Integration
 
             var auth = new Jwt(_context, hash, configuration, _accessor);
 
-            var extract = new DatabaseExtract(_connection, auth);
+            var extract = new DefaultExtract(_connection, auth);
 
             _controller = new ExtractController(extract);
 
@@ -73,9 +73,9 @@ namespace Mobiclone.Test.Integration
                 )
             );
 
-            var begin = new DateTime();
+            var begin = new DateTime(year: 2019, month: 12, day: 1);
 
-            var end = new DateTime();
+            var end = new DateTime(year: 2019, month: 12, day: 31);
 
             var result = await _controller.Index(begin, end);
 
@@ -97,7 +97,7 @@ namespace Mobiclone.Test.Integration
 
             await _context.SaveChangesAsync();
 
-            var pay = await Factory.Revenue(accountId: account.Id);
+            var pay = await Factory.Revenue(accountId: account.Id, date: new DateTime(year: 2019, month: 12, day: 1));
 
             await _context.Revenues.AddAsync(pay);
 
@@ -114,9 +114,132 @@ namespace Mobiclone.Test.Integration
                 )
             );
 
-            var begin = new DateTime();
+            var begin = new DateTime(year: 2019, month: 12, day: 1);
 
-            var end = new DateTime();
+            var end = new DateTime(year: 2019, month: 12, day: 31);
+
+            var result = await _controller.Index(begin, end);
+
+            var response = Assert.IsAssignableFrom<OkObjectResult>(result);
+
+            var transactions = ((ResponseViewModel<IList<Transaction>>)response.Value).Data;
+
+            Assert.Collection(transactions,
+                (it) =>
+                {
+                    Assert.Equal(pay.Id, it.Id);
+                    Assert.Equal(pay.Description, it.Description);
+                    Assert.Equal(pay.Value, it.Value);
+                    Assert.Equal(pay.Date, it.Date);
+                });
+        }
+
+        [Fact]
+        public async void Show_Should_Return_Two_Transactions_When_The_Month_Has_One_Expense_And_One_Revenue()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            await _context.SaveChangesAsync();
+
+            var pay = await Factory.Revenue(accountId: account.Id, date: new DateTime(year: 2019, month: 12, day: 1));
+
+            await _context.Revenues.AddAsync(pay);
+
+            await _context.SaveChangesAsync();
+
+            var gym = await Factory.Expense(accountId: account.Id, date: new DateTime(year: 2019, month: 12, day: 15));
+
+            await _context.Expenses.AddAsync(gym);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var begin = new DateTime(year: 2019, month: 12, day: 1);
+
+            var end = new DateTime(year: 2019, month: 12, day: 31);
+
+            var result = await _controller.Index(begin, end);
+
+            var response = Assert.IsAssignableFrom<OkObjectResult>(result);
+
+            var transactions = ((ResponseViewModel<IList<Transaction>>)response.Value).Data;
+
+            Assert.Collection(transactions,
+                (it) =>
+                {
+                    Assert.Equal(gym.Id, it.Id);
+                    Assert.Equal(gym.Description, it.Description);
+                    Assert.Equal(gym.Value, it.Value);
+                    Assert.Equal(gym.Date, it.Date);
+                },
+                (it) =>
+                {
+                    Assert.Equal(pay.Id, it.Id);
+                    Assert.Equal(pay.Description, it.Description);
+                    Assert.Equal(pay.Value, it.Value);
+                    Assert.Equal(pay.Date, it.Date);
+                });
+        }
+
+        [Fact]
+        public async void Show_Should_Return_Only_One_Transaction_When_The_Month_Has_One_Transaction_And_Another_Month_Has_One_Transaction()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
+
+            var account = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(account);
+
+            await _context.SaveChangesAsync();
+
+            var pay = await Factory.Revenue(accountId: account.Id, date: new DateTime(year: 2019, month: 12, day: 1));
+
+            await _context.Revenues.AddAsync(pay);
+
+            await _context.SaveChangesAsync();
+
+            var gym = await Factory.Expense(accountId: account.Id, date: new DateTime(year: 2020, month: 1, day: 1));
+
+            await _context.Expenses.AddAsync(gym);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    }
+                )
+            );
+
+            var begin = new DateTime(year: 2019, month: 12, day: 1);
+
+            var end = new DateTime(year: 2019, month: 12, day: 31);
 
             var result = await _controller.Index(begin, end);
 

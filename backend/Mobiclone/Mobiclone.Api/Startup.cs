@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
+using System.Data;
 using System.Text;
 
 namespace Mobiclone.Api
@@ -48,11 +50,15 @@ namespace Mobiclone.Api
                     options.TokenValidationParameters.ValidateIssuerSigningKey = true;
                 });
 
+            services.AddScoped<IDbConnection>((provider) => new SqlConnection(connectionString));
+
             services.AddScoped<IHash, Bcrypt>();
 
             services.AddScoped<IAuth, Jwt>();
 
             services.AddScoped<IStorage, DiskStorage>();
+
+            services.AddScoped<IExtract, DefaultExtract>();
 
             services.AddMvc(options => options.EnableEndpointRouting = false);
 
