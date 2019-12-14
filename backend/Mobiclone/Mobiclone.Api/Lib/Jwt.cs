@@ -53,7 +53,7 @@ namespace Mobiclone.Api.Lib
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString())
             };
 
-            var token = new JwtSecurityToken(issuer, audience, claims, signingCredentials: credentials, expires: DateTime.Now.AddMinutes(1));
+            var token = new JwtSecurityToken(issuer, audience, claims, signingCredentials: credentials, expires: DateTime.Now.AddMonths(1));
 
             var handler = new JwtSecurityTokenHandler();
 
