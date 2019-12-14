@@ -2,6 +2,7 @@
 using Mobiclone.Api.Lib;
 using Mobiclone.Api.Models;
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Mobiclone.Test
@@ -28,7 +29,7 @@ namespace Mobiclone.Test
             return user;
         }
 
-        public static Task<Account> Account(string name = null, string type = null, int? userId = null)
+        public async static Task<Account> Account(string name = null, string type = null, int? userId = null)
         {
             var _name = name ?? _faker.Finance.Account();
             var _type = type ?? _faker.Finance.AccountName();
@@ -41,10 +42,10 @@ namespace Mobiclone.Test
                 UserId = _userId
             };
 
-            return Task.FromResult(account);
+            return account;
         }
 
-        public static Task<Revenue> Revenue(string description = null, int? value = null, DateTime? date = null, int? accountId = null)
+        public async static Task<Revenue> Revenue(string description = null, int? value = null, DateTime? date = null, int? accountId = null)
         {
             var _description = description ?? _faker.Lorem.Sentence();
             var _value = value ?? _faker.Random.Int();
@@ -59,10 +60,10 @@ namespace Mobiclone.Test
                 AccountId = _accountId
             };
 
-            return Task.FromResult(revenue);
+            return revenue;
         }
 
-        public static Task<Expense> Expense(string description = null, int? value = null, DateTime? date = null, int? accountId = null)
+        public async static Task<Expense> Expense(string description = null, int? value = null, DateTime? date = null, int? accountId = null)
         {
             var _description = description ?? _faker.Lorem.Sentence();
             var _value = value ?? _faker.Random.Int();
@@ -77,7 +78,23 @@ namespace Mobiclone.Test
                 AccountId = _accountId
             };
 
-            return Task.FromResult(expense);
+            return expense;
+        }
+
+        public async static Task<ClaimsPrincipal> ClaimsPrincipal(int userId)
+        {
+            var claimsPrincipal = new ClaimsPrincipal
+            (
+                new ClaimsIdentity
+                (
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+                    }
+                )
+            );
+
+            return claimsPrincipal;
         }
     }
 }
