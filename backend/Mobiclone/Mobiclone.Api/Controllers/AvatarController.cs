@@ -30,11 +30,11 @@ namespace Mobiclone.Api.Controllers
         [HttpPost]
         [Route("")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseViewModel<string>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Store([FromBody] IFormFile formFile)
+        public async Task<IActionResult> Store(IFormFile formFile)
         {
             var user = await _auth.User();
 

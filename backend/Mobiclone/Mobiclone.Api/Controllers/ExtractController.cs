@@ -25,7 +25,7 @@ namespace Mobiclone.Api.Controllers
         [HttpGet]
         [Route("")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseViewModel<IList<Transaction>>))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Index(DateTime begin, DateTime end)

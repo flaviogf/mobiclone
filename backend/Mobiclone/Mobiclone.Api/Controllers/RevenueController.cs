@@ -30,7 +30,7 @@ namespace Mobiclone.Api.Controllers
         [HttpPost]
         [Route("")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ResponseViewModel<int>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -62,7 +62,7 @@ namespace Mobiclone.Api.Controllers
         [HttpGet]
         [Route("{id}")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseViewModel<Revenue>))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Show([FromRoute] int accountId, [FromRoute] int id)
@@ -85,7 +85,7 @@ namespace Mobiclone.Api.Controllers
         [HttpPut]
         [Route("{id}")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseViewModel<int>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -112,7 +112,7 @@ namespace Mobiclone.Api.Controllers
         [HttpDelete]
         [Route("{id}")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseViewModel<int>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Destroy([FromRoute] int accountId, [FromRoute] int id)
@@ -128,7 +128,9 @@ namespace Mobiclone.Api.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok(revenue);
+            var response = new ResponseViewModel<int>(revenue.Id);
+
+            return Ok(response);
         }
     }
 }

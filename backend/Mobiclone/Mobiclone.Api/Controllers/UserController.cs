@@ -26,7 +26,7 @@ namespace Mobiclone.Api.Controllers
         [HttpPost]
         [Route("")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ResponseViewModel<int>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Store([FromBody] StoreUserViewModel viewModel)
