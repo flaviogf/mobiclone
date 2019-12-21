@@ -1,8 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Mobiclone.Api.Controllers;
 using Mobiclone.Api.Database;
 using Mobiclone.Api.Lib;
+using Mobiclone.Api.Models;
+using Mobiclone.Api.ViewModels;
 using Mobiclone.Api.ViewModels.User;
 using System;
 using Xunit;
@@ -15,15 +20,32 @@ namespace Mobiclone.Test.Integration
 
         private readonly UserController _controller;
 
+        private readonly SqliteConnection _connection;
+
+        private readonly HttpContextAccessor _accessor;
+
         public UserControllerTests()
         {
-            var builder = new DbContextOptionsBuilder<MobicloneContext>().UseInMemoryDatabase("user");
+            _connection = new SqliteConnection("Data Source=:memory:");
 
-            _context = new MobicloneContext(builder.Options);
+            _connection.Open();
+
+            var options = new DbContextOptionsBuilder<MobicloneContext>().UseSqlite(_connection).Options;
+
+            _context = new MobicloneContext(options);
 
             var hash = new Bcrypt();
 
-            _controller = new UserController(_context, hash);
+            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Test.json").Build();
+
+            _accessor = new HttpContextAccessor
+            {
+                HttpContext = new DefaultHttpContext()
+            };
+
+            var auth = new Jwt(_context, hash, configuration, _accessor);
+
+            _controller = new UserController(_context, auth, hash);
 
             _context.Database.EnsureCreated();
         }
@@ -64,8 +86,72 @@ namespace Mobiclone.Test.Integration
                 });
         }
 
+        [Fact]
+        public async void Show_Should_Return_Status_200()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = await Factory.ClaimsPrincipal(userId: user.Id);
+
+            var result = await _controller.Show();
+
+            Assert.IsAssignableFrom<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Show_Should_Return_User()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = await Factory.ClaimsPrincipal(userId: user.Id);
+
+            var result = await _controller.Show();
+
+            var response = Assert.IsAssignableFrom<OkObjectResult>(result);
+
+            var data = ((ResponseViewModel<User>)response.Value).Data;
+
+            Assert.Equal(user, data);
+        }
+
+        [Fact]
+        public async void Show_Should_Return_User_With_File()
+        {
+            var file = await Factory.File();
+
+            await _context.Files.AddAsync(file);
+
+            await _context.SaveChangesAsync();
+
+            var user = await Factory.User(fileId: file.Id);
+
+            await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = await Factory.ClaimsPrincipal(userId: user.Id);
+
+            var result = await _controller.Show();
+
+            var response = Assert.IsAssignableFrom<OkObjectResult>(result);
+
+            var data = ((ResponseViewModel<User>)response.Value).Data;
+
+            Assert.Equal(file, data.File);
+        }
+
         public void Dispose()
         {
+            _connection.Close();
+
             _context.Database.EnsureDeleted();
         }
     }

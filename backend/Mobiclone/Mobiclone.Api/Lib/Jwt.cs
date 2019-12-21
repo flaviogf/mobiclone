@@ -67,6 +67,7 @@ namespace Mobiclone.Api.Lib
             int.TryParse(_accessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value, out var id);
 
             var user = await (from u in _context.Users
+                              .Include(it => it.File)
                               where u.Id == id
                               select u).FirstAsync();
 

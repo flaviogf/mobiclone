@@ -13,7 +13,7 @@ namespace Mobiclone.Test
 
         private static readonly IHash _hash = new Bcrypt();
 
-        public async static Task<User> User(string name = null, string email = null, string password = null)
+        public async static Task<User> User(string name = null, string email = null, string password = null, int? fileId = null)
         {
             var _name = name ?? _faker.Person.FirstName;
             var _email = email ?? _faker.Person.Email;
@@ -23,7 +23,8 @@ namespace Mobiclone.Test
             {
                 Name = _name,
                 Email = _email,
-                PasswordHash = await _hash.Make(_password)
+                PasswordHash = await _hash.Make(_password),
+                FileId = fileId
             };
 
             return user;
@@ -95,6 +96,21 @@ namespace Mobiclone.Test
             );
 
             return claimsPrincipal;
+        }
+
+        public static async Task<File> File(string name = null, string path = null)
+        {
+            var _name = name ?? _faker.Internet.UserName();
+
+            var _path = path ?? _faker.Internet.Url();
+
+            var file = new File
+            {
+                Name = _name,
+                Path = _path
+            };
+
+            return file;
         }
     }
 }

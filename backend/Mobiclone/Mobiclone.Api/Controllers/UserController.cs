@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mobiclone.Api.Database;
@@ -15,11 +16,14 @@ namespace Mobiclone.Api.Controllers
     {
         private readonly MobicloneContext _context;
 
+        private readonly IAuth _auth;
+
         private readonly IHash _hash;
 
-        public UserController(MobicloneContext context, IHash hash)
+        public UserController(MobicloneContext context, IAuth auth, IHash hash)
         {
             _context = context;
+            _auth = auth;
             _hash = hash;
         }
 
@@ -45,6 +49,22 @@ namespace Mobiclone.Api.Controllers
             var response = new ResponseViewModel<int>(user.Id);
 
             return Created($"/user/{user.Id}", response);
+        }
+
+        [HttpGet]
+        [Route("")]
+        [Authorize]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseViewModel<User>))]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Show()
+        {
+            var user = await _auth.User();
+
+            var response = new ResponseViewModel<User>(user);
+
+            return Ok(response);
         }
     }
 }
