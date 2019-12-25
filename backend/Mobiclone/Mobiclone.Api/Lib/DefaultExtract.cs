@@ -34,7 +34,18 @@ namespace Mobiclone.Api.Lib
                 INNER JOIN Accounts accounts ON expenses.AccountId = accounts.Id
                 INNER JOIN Users users ON accounts.UserId = users.Id
                 WHERE expenses.Date BETWEEN @Begin AND @End AND users.Id = @UserId
-                ORDER BY Date DESC",
+                UNION
+                SELECT outputs.Id, outputs.Description, outputs.Value, outputs.Date FROM Outputs outputs
+                INNER JOIN Accounts accounts ON outputs.ToId = accounts.Id
+                INNER JOIN Users users ON accounts.UserId = users.Id
+                WHERE outputs.Date BETWEEN @Begin AND @End AND users.Id = @UserId
+                UNION
+                SELECT inputs.Id, inputs.Description, inputs.Value, inputs.Date FROM Inputs inputs
+                INNER JOIN Accounts accounts ON inputs.ToId = accounts.Id
+                INNER JOIN Users users ON accounts.UserId = users.Id
+                WHERE inputs.Date BETWEEN @Begin AND @End AND users.Id = @UserId
+                ORDER BY Date DESC
+                ",
                 new
                 {
                     Begin = begin,

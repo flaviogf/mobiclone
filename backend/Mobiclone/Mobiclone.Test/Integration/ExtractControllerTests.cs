@@ -122,9 +122,9 @@ namespace Mobiclone.Test.Integration
 
             var response = Assert.IsAssignableFrom<OkObjectResult>(result);
 
-            var transactions = ((ResponseViewModel<IList<Transition>>)response.Value).Data;
+            var transitions = ((ResponseViewModel<IList<Transition>>)response.Value).Data;
 
-            Assert.Collection(transactions,
+            Assert.Collection(transitions,
                 (it) =>
                 {
                     Assert.Equal(pay.Id, it.Id);
@@ -135,7 +135,7 @@ namespace Mobiclone.Test.Integration
         }
 
         [Fact]
-        public async void Show_Should_Return_Two_Transitions_When_The_Month_Has_One_Expense_And_One_Revenue()
+        public async void Index_Should_Return_Two_Transitions_When_The_Month_Has_One_Expense_And_One_Revenue()
         {
             var user = await Factory.User();
 
@@ -180,9 +180,9 @@ namespace Mobiclone.Test.Integration
 
             var response = Assert.IsAssignableFrom<OkObjectResult>(result);
 
-            var transactions = ((ResponseViewModel<IList<Transition>>)response.Value).Data;
+            var transitions = ((ResponseViewModel<IList<Transition>>)response.Value).Data;
 
-            Assert.Collection(transactions,
+            Assert.Collection(transitions,
                 (it) =>
                 {
                     Assert.Equal(gym.Id, it.Id);
@@ -200,7 +200,7 @@ namespace Mobiclone.Test.Integration
         }
 
         [Fact]
-        public async void Show_Should_Return_Only_One_Transition_When_The_Month_Has_One_Transition_And_Another_Month_Has_One_Transition()
+        public async void Index_Should_Return_Only_One_Transition_When_The_Month_Has_One_Transition_And_Another_Month_Has_One_Transition()
         {
             var user = await Factory.User();
 
@@ -245,15 +245,75 @@ namespace Mobiclone.Test.Integration
 
             var response = Assert.IsAssignableFrom<OkObjectResult>(result);
 
-            var transactions = ((ResponseViewModel<IList<Transition>>)response.Value).Data;
+            var transitions = ((ResponseViewModel<IList<Transition>>)response.Value).Data;
 
-            Assert.Collection(transactions,
+            Assert.Collection(transitions,
                 (it) =>
                 {
                     Assert.Equal(pay.Id, it.Id);
                     Assert.Equal(pay.Description, it.Description);
                     Assert.Equal(pay.Value, it.Value);
                     Assert.Equal(pay.Date, it.Date);
+                });
+        }
+
+        [Fact]
+        public async void Index_Should_Return_Two_Transitions_When_The_Current_Month_Has_An_Output_And_And_Input()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
+
+            var nubank = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(nubank);
+
+            await _context.SaveChangesAsync();
+
+            var itau = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(itau);
+
+            await _context.SaveChangesAsync();
+
+            var output = await Factory.Output(toId: nubank.Id, fromId: itau.Id, date: new DateTime(year: 2019, month: 12, day: 25));
+
+            await _context.Outputs.AddAsync(output);
+
+            await _context.SaveChangesAsync();
+
+            var input = await Factory.Input(toId: nubank.Id, fromId: itau.Id, date: new DateTime(year: 2019, month: 12, day: 25));
+
+            await _context.Inputs.AddAsync(input);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = await Factory.ClaimsPrincipal(userId: user.Id);
+
+            var start = new DateTime(year: 2019, month: 12, day: 1);
+
+            var end = new DateTime(year: 2019, month: 12, day: 31);
+
+            var result = await _controller.Index(start, end);
+
+            var response = Assert.IsAssignableFrom<OkObjectResult>(result);
+            
+            var transitions = ((ResponseViewModel<IList<Transition>>)response.Value).Data;
+
+            Assert.Collection(transitions,
+                (it) =>
+                {
+                    Assert.Equal(output.Description, it.Description);
+                    Assert.Equal(output.Value, it.Value);
+                    Assert.Equal(output.Date, it.Date);
+                },
+                (it) =>
+                {
+                    Assert.Equal(input.Description, it.Description);
+                    Assert.Equal(input.Value, it.Value);
+                    Assert.Equal(input.Date, it.Date);
                 });
         }
 

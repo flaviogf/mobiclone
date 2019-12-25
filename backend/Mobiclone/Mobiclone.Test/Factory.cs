@@ -112,5 +112,41 @@ namespace Mobiclone.Test
 
             return file;
         }
+
+        public static async Task<Output> Output(int toId, int fromId, string description = null, DateTime? date = null, int? value = null)
+        {
+            var _description = description ?? _faker.Lorem.Sentence();
+            var _date = date ?? DateTime.Now;
+            var _value = value ?? _faker.Random.Int();
+
+            var output = new Output
+            {
+                Description = _description,
+                Date = _date,
+                Value = _value,
+                ToId = toId,
+                FromId = fromId
+            };
+
+            return output;
+        }
+
+        public static async Task<Input> Input(int toId, int fromId, string description = null, DateTime? date = null, int? value = null)
+        {
+            var _description = description ?? _faker.Lorem.Sentence();
+            var _date = date ?? DateTime.Now;
+            var _value = value ?? _faker.Random.Int();
+
+            var input = new Input
+            {
+                Description = _description,
+                Date = _date,
+                Value = _value,
+                ToId = toId,
+                FromId = fromId
+            };
+
+            return input;
+        }
     }
 }
