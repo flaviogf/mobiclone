@@ -60,6 +60,8 @@ namespace Mobiclone.Api
 
             services.AddScoped<IExtract, DefaultExtract>();
 
+            services.AddCors();
+
             services.AddMvc(options => options.EnableEndpointRouting = false);
 
             services.AddSwaggerGen(options =>
@@ -102,6 +104,10 @@ namespace Mobiclone.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors(options => options.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
 
             app.UseAuthentication();
 
