@@ -30,9 +30,9 @@ namespace Mobiclone.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Index(DateTime begin, DateTime end)
         {
-            var transactions = await _extract.Read(begin, end);
+            var transitions = await _extract.Read(begin, end);
 
-            var response = new ResponseViewModel<IList<Transaction>>(transactions);
+            var response = new ResponseViewModel<IList<Transition>>(transitions);
 
             return Ok(response);
         }

@@ -83,7 +83,7 @@ namespace Mobiclone.Test.Integration
         }
 
         [Fact]
-        public async void Index_Should_Return_Only_One_Transaction()
+        public async void Index_Should_Return_Only_One_Transition()
         {
             var user = await Factory.User();
 
@@ -122,7 +122,7 @@ namespace Mobiclone.Test.Integration
 
             var response = Assert.IsAssignableFrom<OkObjectResult>(result);
 
-            var transactions = ((ResponseViewModel<IList<Transaction>>)response.Value).Data;
+            var transactions = ((ResponseViewModel<IList<Transition>>)response.Value).Data;
 
             Assert.Collection(transactions,
                 (it) =>
@@ -135,7 +135,7 @@ namespace Mobiclone.Test.Integration
         }
 
         [Fact]
-        public async void Show_Should_Return_Two_Transactions_When_The_Month_Has_One_Expense_And_One_Revenue()
+        public async void Show_Should_Return_Two_Transitions_When_The_Month_Has_One_Expense_And_One_Revenue()
         {
             var user = await Factory.User();
 
@@ -180,7 +180,7 @@ namespace Mobiclone.Test.Integration
 
             var response = Assert.IsAssignableFrom<OkObjectResult>(result);
 
-            var transactions = ((ResponseViewModel<IList<Transaction>>)response.Value).Data;
+            var transactions = ((ResponseViewModel<IList<Transition>>)response.Value).Data;
 
             Assert.Collection(transactions,
                 (it) =>
@@ -200,7 +200,7 @@ namespace Mobiclone.Test.Integration
         }
 
         [Fact]
-        public async void Show_Should_Return_Only_One_Transaction_When_The_Month_Has_One_Transaction_And_Another_Month_Has_One_Transaction()
+        public async void Show_Should_Return_Only_One_Transition_When_The_Month_Has_One_Transition_And_Another_Month_Has_One_Transition()
         {
             var user = await Factory.User();
 
@@ -245,7 +245,7 @@ namespace Mobiclone.Test.Integration
 
             var response = Assert.IsAssignableFrom<OkObjectResult>(result);
 
-            var transactions = ((ResponseViewModel<IList<Transaction>>)response.Value).Data;
+            var transactions = ((ResponseViewModel<IList<Transition>>)response.Value).Data;
 
             Assert.Collection(transactions,
                 (it) =>

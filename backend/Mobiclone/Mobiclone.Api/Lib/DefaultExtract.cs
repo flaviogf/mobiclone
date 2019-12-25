@@ -19,18 +19,18 @@ namespace Mobiclone.Api.Lib
             _auth = auth;
         }
 
-        public async Task<IList<Transaction>> Read(DateTime begin, DateTime end)
+        public async Task<IList<Transition>> Read(DateTime begin, DateTime end)
         {
             var user = await _auth.User();
 
-            var transactions = await _connection.QueryAsync<Transaction>(
+            var transitions = await _connection.QueryAsync<Transition>(
                 @"
-                SELECT revenues.Id, revenues.Description, revenues.Value, revenues.Date, revenues.AccountId FROM Revenues revenues
+                SELECT revenues.Id, revenues.Description, revenues.Value, revenues.Date FROM Revenues revenues
                 INNER JOIN Accounts accounts ON revenues.AccountId = accounts.Id
                 INNER JOIN Users users ON accounts.UserId = users.Id
                 WHERE revenues.Date BETWEEN @Begin AND @End AND users.Id = @UserId
                 UNION
-                SELECT expenses.Id, expenses.Description, expenses.Value, expenses.Date, expenses.AccountId FROM Expenses expenses
+                SELECT expenses.Id, expenses.Description, expenses.Value, expenses.Date FROM Expenses expenses
                 INNER JOIN Accounts accounts ON expenses.AccountId = accounts.Id
                 INNER JOIN Users users ON accounts.UserId = users.Id
                 WHERE expenses.Date BETWEEN @Begin AND @End AND users.Id = @UserId
@@ -43,7 +43,7 @@ namespace Mobiclone.Api.Lib
                 }
             );
 
-            return transactions.AsList();
+            return transitions.AsList();
         }
     }
 }

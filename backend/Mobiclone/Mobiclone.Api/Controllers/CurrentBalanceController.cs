@@ -36,15 +36,11 @@ namespace Mobiclone.Api.Controllers
             var user = await _auth.User();
 
             var revenues = await (from current in _context.Revenues
-                                  join accounts in _context.Accounts on current.AccountId equals accounts.Id
-                                  join users in _context.Users on accounts.UserId equals users.Id
-                                  where users.Id == user.Id
+                                  where current.Account.User == user
                                   select current.Value).SumAsync();
 
             var expenses = await (from current in _context.Expenses
-                                  join accounts in _context.Accounts on current.AccountId equals accounts.Id
-                                  join users in _context.Users on accounts.UserId equals user.Id
-                                  where users.Id == user.Id
+                                  where current.Account.User == user
                                   select current.Value).SumAsync();
 
             var balance = revenues + expenses;

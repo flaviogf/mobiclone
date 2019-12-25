@@ -7,6 +7,6 @@ namespace Mobiclone.Api.Lib
 {
     public interface IExtract
     {
-        Task<IList<Transaction>> Read(DateTime begin, DateTime end);
+        Task<IList<Transition>> Read(DateTime begin, DateTime end);
     }
 }
