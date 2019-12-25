@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mobiclone.Api.Database;
 
 namespace Mobiclone.Api.Migrations
 {
     [DbContext(typeof(MobicloneContext))]
-    partial class MobicloneContextModelSnapshot : ModelSnapshot
+    [Migration("20191225145315_create_table_inputs")]
+    partial class create_table_inputs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,9 +124,11 @@ namespace Mobiclone.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FromId");
+                    b.HasIndex("FromId")
+                        .IsUnique();
 
-                    b.HasIndex("ToId");
+                    b.HasIndex("ToId")
+                        .IsUnique();
 
                     b.ToTable("Inputs");
                 });
@@ -155,9 +159,11 @@ namespace Mobiclone.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FromId");
+                    b.HasIndex("FromId")
+                        .IsUnique();
 
-                    b.HasIndex("ToId");
+                    b.HasIndex("ToId")
+                        .IsUnique();
 
                     b.ToTable("Outputs");
                 });
@@ -236,21 +242,21 @@ namespace Mobiclone.Api.Migrations
                     b.HasOne("Mobiclone.Api.Models.Account", "Account")
                         .WithMany()
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Mobiclone.Api.Models.Input", b =>
                 {
                     b.HasOne("Mobiclone.Api.Models.Account", "From")
-                        .WithMany()
-                        .HasForeignKey("FromId")
+                        .WithOne()
+                        .HasForeignKey("Mobiclone.Api.Models.Input", "FromId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.HasOne("Mobiclone.Api.Models.Account", "To")
-                        .WithMany()
-                        .HasForeignKey("ToId")
+                        .WithOne()
+                        .HasForeignKey("Mobiclone.Api.Models.Input", "ToId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
                 });
@@ -258,14 +264,14 @@ namespace Mobiclone.Api.Migrations
             modelBuilder.Entity("Mobiclone.Api.Models.Output", b =>
                 {
                     b.HasOne("Mobiclone.Api.Models.Account", "From")
-                        .WithMany()
-                        .HasForeignKey("FromId")
+                        .WithOne()
+                        .HasForeignKey("Mobiclone.Api.Models.Output", "FromId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.HasOne("Mobiclone.Api.Models.Account", "To")
-                        .WithMany()
-                        .HasForeignKey("ToId")
+                        .WithOne()
+                        .HasForeignKey("Mobiclone.Api.Models.Output", "ToId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
                 });
@@ -275,7 +281,7 @@ namespace Mobiclone.Api.Migrations
                     b.HasOne("Mobiclone.Api.Models.Account", "Account")
                         .WithMany()
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mobiclone.Api.Database;
 
 namespace Mobiclone.Api.Migrations
 {
     [DbContext(typeof(MobicloneContext))]
-    partial class MobicloneContextModelSnapshot : ModelSnapshot
+    [Migration("20191225143312_create_table_outputs")]
+    partial class create_table_outputs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -96,39 +98,6 @@ namespace Mobiclone.Api.Migrations
                     b.ToTable("Files");
                 });
 
-            modelBuilder.Entity("Mobiclone.Api.Models.Input", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
-
-                    b.Property<int>("FromId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ToId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Value")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FromId");
-
-                    b.HasIndex("ToId");
-
-                    b.ToTable("Inputs");
-                });
-
             modelBuilder.Entity("Mobiclone.Api.Models.Output", b =>
                 {
                     b.Property<int>("Id")
@@ -155,9 +124,11 @@ namespace Mobiclone.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FromId");
+                    b.HasIndex("FromId")
+                        .IsUnique();
 
-                    b.HasIndex("ToId");
+                    b.HasIndex("ToId")
+                        .IsUnique();
 
                     b.ToTable("Outputs");
                 });
@@ -236,36 +207,21 @@ namespace Mobiclone.Api.Migrations
                     b.HasOne("Mobiclone.Api.Models.Account", "Account")
                         .WithMany()
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Mobiclone.Api.Models.Input", b =>
-                {
-                    b.HasOne("Mobiclone.Api.Models.Account", "From")
-                        .WithMany()
-                        .HasForeignKey("FromId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.HasOne("Mobiclone.Api.Models.Account", "To")
-                        .WithMany()
-                        .HasForeignKey("ToId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Mobiclone.Api.Models.Output", b =>
                 {
                     b.HasOne("Mobiclone.Api.Models.Account", "From")
-                        .WithMany()
-                        .HasForeignKey("FromId")
+                        .WithOne()
+                        .HasForeignKey("Mobiclone.Api.Models.Output", "FromId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.HasOne("Mobiclone.Api.Models.Account", "To")
-                        .WithMany()
-                        .HasForeignKey("ToId")
+                        .WithOne()
+                        .HasForeignKey("Mobiclone.Api.Models.Output", "ToId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
                 });
@@ -275,7 +231,7 @@ namespace Mobiclone.Api.Migrations
                     b.HasOne("Mobiclone.Api.Models.Account", "Account")
                         .WithMany()
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

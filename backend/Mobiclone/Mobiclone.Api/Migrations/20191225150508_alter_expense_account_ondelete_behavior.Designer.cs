@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mobiclone.Api.Database;
 
 namespace Mobiclone.Api.Migrations
 {
     [DbContext(typeof(MobicloneContext))]
-    partial class MobicloneContextModelSnapshot : ModelSnapshot
+    [Migration("20191225150508_alter_expense_account_ondelete_behavior")]
+    partial class alter_expense_account_ondelete_behavior
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
