@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:mobiclone/pages/sign_in/sign_in_page.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignInPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        iconTheme: IconThemeData(
+          color: Colors.deepPurple,
+        ),
         elevation: 0.0,
       ),
       backgroundColor: Colors.white,
@@ -22,13 +24,13 @@ class SignUpPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5.0),
                     color: Colors.deepPurple,
                   ),
+                  height: 80,
+                  width: 80,
                   child: Icon(
                     Icons.monetization_on,
                     color: Colors.white,
                     size: 40.0,
                   ),
-                  height: 80,
-                  width: 80,
                 ),
               ),
               SizedBox(
@@ -36,7 +38,7 @@ class SignUpPage extends StatelessWidget {
               ),
               Center(
                 child: Text(
-                  'Sign up to start',
+                  'Sign in to start',
                   style: TextStyle(
                     color: Colors.black54,
                     fontSize: 32.0,
@@ -47,10 +49,10 @@ class SignUpPage extends StatelessWidget {
                 height: 40.0,
               ),
               RaisedButton(
-                onPressed: () {},
                 padding: EdgeInsets.all(24.0),
+                onPressed: () {},
                 child: Text(
-                  'Sign up with email',
+                  'Sign in with email',
                   style: TextStyle(
                     fontSize: 20.0,
                   ),
@@ -60,22 +62,17 @@ class SignUpPage extends StatelessWidget {
                 height: 24.0,
               ),
               OutlineButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => SignInPage(),
-                    ),
-                  );
-                },
                 padding: EdgeInsets.all(24.0),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
                 child: Text(
-                  'Sign in',
+                  'Sign up',
                   style: TextStyle(
                     fontSize: 20.0,
-                    color: Colors.deepPurpleAccent,
                   ),
                 ),
-              ),
+              )
             ],
           ),
         ),
