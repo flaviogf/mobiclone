@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobiclone/pages/email/email_page.dart';
 
-class NamePage extends StatelessWidget {
+class PasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,10 +20,10 @@ class NamePage extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
-                'Enter your name',
+                'Enter your password',
                 style: TextStyle(
                   color: Colors.black54,
-                  fontSize: 36.0,
+                  fontSize: 36,
                 ),
               ),
             ),
@@ -36,14 +35,14 @@ class NamePage extends StatelessWidget {
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'João',
+                    hintText: 'strong password',
                     hintStyle: TextStyle(
                       color: Colors.black26,
                     ),
                   ),
                   style: TextStyle(
-                    color: Colors.black54,
                     fontSize: 36.0,
+                    color: Colors.black54,
                   ),
                   maxLines: null,
                   expands: true,
@@ -55,25 +54,14 @@ class NamePage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(0),
               ),
               padding: EdgeInsets.all(24.0),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => EmailPage(),
-                  ),
-                );
-              },
+              onPressed: () {},
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    'Next',
+                    'Finish',
                     style: TextStyle(
                       fontSize: 20.0,
                     ),
-                  ),
-                  Icon(
-                    Icons.arrow_forward,
                   ),
                 ],
               ),

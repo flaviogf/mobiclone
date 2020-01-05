@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mobiclone/pages/email/email_page.dart';
+import 'package:mobiclone/pages/password/password_page.dart';
 
-class NamePage extends StatelessWidget {
+class EmailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,10 +21,10 @@ class NamePage extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
-                'Enter your name',
+                'Enter your email',
                 style: TextStyle(
                   color: Colors.black54,
-                  fontSize: 36.0,
+                  fontSize: 36,
                 ),
               ),
             ),
@@ -36,7 +36,7 @@ class NamePage extends StatelessWidget {
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'João',
+                    hintText: 'joao@email.com',
                     hintStyle: TextStyle(
                       color: Colors.black26,
                     ),
@@ -58,23 +58,20 @@ class NamePage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => EmailPage(),
+                    builder: (_) => PasswordPage(),
                   ),
                 );
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Text(
                     'Next',
                     style: TextStyle(
-                      fontSize: 20.0,
+                      fontSize: 20,
                     ),
                   ),
-                  Icon(
-                    Icons.arrow_forward,
-                  ),
+                  Icon(Icons.arrow_forward),
                 ],
               ),
             )
