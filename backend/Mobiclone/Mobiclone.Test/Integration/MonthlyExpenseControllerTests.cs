@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Mobiclone.Test.Integration
 {
-    public class MonthlyExpenseControllerTests : IDisposable
+    public sealed class MonthlyExpenseControllerTests : IDisposable
     {
         private readonly MobicloneContext _context;
 

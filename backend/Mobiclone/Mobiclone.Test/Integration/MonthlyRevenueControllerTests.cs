@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Mobiclone.Test.Integration
 {
-    public class MonthlyRevenueControllerTests : IDisposable
+    public sealed class MonthlyRevenueControllerTests : IDisposable
     {
         private readonly MobicloneContext _context;
 
@@ -95,7 +95,7 @@ namespace Mobiclone.Test.Integration
 
             await _context.SaveChangesAsync();
 
-            var pay = await Factory.Revenue(accountId: account.Id, value: 280000);
+            var pay = await Factory.Revenue(accountId: account.Id, value: 280000, date: new DateTime(year: 2019, month: 12, day: 15));
 
             await _context.Revenues.AddAsync(pay);
 

@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Mobiclone.Api.Database;
+using Mobiclone.Api.Lib;
 using Mobiclone.Api.Models;
 using Mobiclone.Api.ViewModels;
 using Mobiclone.Api.ViewModels.Transfer;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Mobiclone.Api.Controllers
@@ -16,9 +19,12 @@ namespace Mobiclone.Api.Controllers
     {
         private readonly MobicloneContext _context;
 
-        public TransferController(MobicloneContext context)
+        private readonly IAuth _auth;
+
+        public TransferController(MobicloneContext context, IAuth auth)
         {
             _context = context;
+            _auth = auth;
         }
 
         [HttpPost]
@@ -58,6 +64,37 @@ namespace Mobiclone.Api.Controllers
             var response = new ResponseViewModel<int>(output.Id);
 
             return Created($"transfer/{output.Id}", response);
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Show(int id)
+        {
+            var output = await (from current in _context.Outputs
+                                .Include(it => it.To)
+                                .Include(it => it.From)
+                                where current.Id == id
+                                select current).FirstAsync();
+
+            var input = await (from current in _context.Inputs
+                               .Include(it => it.To)
+                               .Include(it => it.From)
+                               where current.Id == id
+                               select current).FirstAsync();
+
+            var viewModel = new ShowTransferViewModel
+            {
+                Output = output,
+                Input = input
+            };
+
+            var response = new ResponseViewModel<ShowTransferViewModel>(viewModel);
+
+            return Ok(response);
         }
     }
 }

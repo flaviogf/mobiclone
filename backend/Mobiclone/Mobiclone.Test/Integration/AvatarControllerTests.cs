@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Mobiclone.Test.Integration
 {
-    public class AvatarControllerTests : IDisposable
+    public sealed class AvatarControllerTests : IDisposable
     {
         private readonly SqliteConnection _connection;
 

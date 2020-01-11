@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Mobiclone.Test.Integration
 {
-    public class CurrentBalanceControllerTests : IDisposable
+    public sealed class CurrentBalanceControllerTests : IDisposable
     {
         private readonly SqliteConnection _connection;
 

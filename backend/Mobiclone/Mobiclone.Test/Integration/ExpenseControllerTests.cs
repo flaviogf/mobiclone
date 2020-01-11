@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Mobiclone.Test.Integration
 {
-    public class ExpenseControllerTests : IDisposable
+    public sealed class ExpenseControllerTests : IDisposable
     {
         private readonly MobicloneContext _context;
 

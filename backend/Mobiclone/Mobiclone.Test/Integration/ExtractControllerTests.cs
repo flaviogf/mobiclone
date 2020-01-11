@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Mobiclone.Test.Integration
 {
-    public class ExtractControllerTests : IDisposable
+    public sealed class ExtractControllerTests : IDisposable
     {
         private readonly SqliteConnection _connection;
 
@@ -284,7 +284,7 @@ namespace Mobiclone.Test.Integration
 
             await _context.SaveChangesAsync();
 
-            var input = await Factory.Input(toId: nubank.Id, fromId: itau.Id, date: new DateTime(year: 2019, month: 12, day: 25));
+            var input = await Factory.Input(toId: nubank.Id, fromId: itau.Id, date: new DateTime(year: 2019, month: 12, day: 24));
 
             await _context.Inputs.AddAsync(input);
 

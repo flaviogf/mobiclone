@@ -1,19 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Mobiclone.Api.Controllers;
 using Mobiclone.Api.Database;
+using Mobiclone.Api.Lib;
+using Mobiclone.Api.ViewModels;
 using Mobiclone.Api.ViewModels.Transfer;
 using System;
 using Xunit;
 
 namespace Mobiclone.Test.Integration
 {
-    public class TransferControllerTests : IDisposable
+    public sealed class TransferControllerTests : IDisposable
     {
         private readonly SqliteConnection _connection;
 
         private readonly MobicloneContext _context;
+
+        private readonly HttpContextAccessor _accessor;
 
         private readonly TransferController _controller;
 
@@ -27,7 +33,18 @@ namespace Mobiclone.Test.Integration
 
             _context = new MobicloneContext(options);
 
-            _controller = new TransferController(_context);
+            var hash = new Bcrypt();
+
+            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Test.json").Build();
+
+            _accessor = new HttpContextAccessor
+            {
+                HttpContext = new DefaultHttpContext()
+            };
+
+            var auth = new Jwt(_context, hash, configuration, _accessor);
+
+            _controller = new TransferController(_context, auth);
 
             _context.Database.EnsureCreated();
         }
@@ -52,6 +69,8 @@ namespace Mobiclone.Test.Integration
             await _context.Accounts.AddAsync(itau);
 
             await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = await Factory.ClaimsPrincipal(userId: user.Id);
 
             var viewModel = new StoreTransferViewModel
             {
@@ -87,6 +106,8 @@ namespace Mobiclone.Test.Integration
             await _context.Accounts.AddAsync(itau);
 
             await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = await Factory.ClaimsPrincipal(userId: user.Id);
 
             var viewModel = new StoreTransferViewModel
             {
@@ -131,6 +152,8 @@ namespace Mobiclone.Test.Integration
 
             await _context.SaveChangesAsync();
 
+            _accessor.HttpContext.User = await Factory.ClaimsPrincipal(userId: user.Id);
+
             var viewModel = new StoreTransferViewModel
             {
                 Description = "Save money",
@@ -153,11 +176,105 @@ namespace Mobiclone.Test.Integration
                 });
         }
 
+        [Fact]
+        public async void Show_Should_Return_Status_200()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
+
+            var itau = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(itau);
+
+            await _context.SaveChangesAsync();
+
+            var nubank = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(nubank);
+
+            await _context.SaveChangesAsync();
+
+            var output = await Factory.Output(toId: nubank.Id, fromId: itau.Id);
+
+            await _context.Outputs.AddAsync(output);
+
+            await _context.SaveChangesAsync();
+
+            var input = await Factory.Input(toId: nubank.Id, fromId: itau.Id);
+
+            await _context.Inputs.AddAsync(input);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = await Factory.ClaimsPrincipal(userId: user.Id);
+
+            var result = await _controller.Show(output.Id);
+
+            Assert.IsAssignableFrom<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Show_Should_Return_Output_With_Its_Input()
+        {
+            var user = await Factory.User();
+
+            await _context.Users.AddAsync(user);
+
+            await _context.SaveChangesAsync();
+
+            var itau = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(itau);
+
+            await _context.SaveChangesAsync();
+
+            var nubank = await Factory.Account(userId: user.Id);
+
+            await _context.Accounts.AddAsync(nubank);
+
+            await _context.SaveChangesAsync();
+
+            var output = await Factory.Output(toId: nubank.Id, fromId: itau.Id);
+
+            await _context.Outputs.AddAsync(output);
+
+            await _context.SaveChangesAsync();
+
+            var input = await Factory.Input(toId: nubank.Id, fromId: itau.Id);
+
+            await _context.Inputs.AddAsync(input);
+
+            await _context.SaveChangesAsync();
+
+            _accessor.HttpContext.User = await Factory.ClaimsPrincipal(userId: user.Id);
+
+            var result = await _controller.Show(output.Id);
+
+            var response = Assert.IsAssignableFrom<OkObjectResult>(result);
+
+            var data = ((ResponseViewModel<ShowTransferViewModel>)response.Value).Data;
+
+            Assert.Equal(output.Description, data.Output.Description);
+            Assert.Equal(output.Date, data.Output.Date);
+            Assert.Equal(output.Value, data.Output.Value);
+            Assert.Equal(output.ToId, data.Output.ToId);
+            Assert.Equal(output.FromId, data.Output.FromId);
+
+            Assert.Equal(input.Description, data.Input.Description);
+            Assert.Equal(input.Date, data.Input.Date);
+            Assert.Equal(input.Value, data.Input.Value);
+            Assert.Equal(input.ToId, data.Input.ToId);
+            Assert.Equal(input.FromId, data.Input.FromId);
+        }
+
         public void Dispose()
         {
-            _connection.Close();
-
             _context.Database.EnsureDeleted();
+
+            _connection.Close();
         }
     }
 }

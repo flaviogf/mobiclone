@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Mobiclone.Test.Integration
 {
-    public class SessionControllerTests : IDisposable
+    public sealed class SessionControllerTests : IDisposable
     {
         private readonly SessionController _controller;
 
