@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:mobiclone/pages/password/password_page.dart';
 
-class EmailPage extends StatelessWidget {
+class EmailPage extends StatefulWidget {
+  final String name;
+
+  const EmailPage({
+    Key key,
+    this.name,
+  }) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => EmailPageState();
+}
+
+class EmailPageState extends State<EmailPage> {
   @override
   Widget build(BuildContext context) {
+    debugPrint(widget.name);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
