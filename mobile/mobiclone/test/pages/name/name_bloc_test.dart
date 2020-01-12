@@ -23,7 +23,7 @@ void main() {
     );
 
     test(
-      'return "ValidatedNameState" when the name submitted was valid',
+      'return "ValidatedNameState" when the name submitted is valid',
       () {
         _bloc.add(NameEventSubmit('flavio'));
 

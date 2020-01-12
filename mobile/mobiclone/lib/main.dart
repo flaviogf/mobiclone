@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kiwi/kiwi.dart' as kiwi;
+import 'package:mobiclone/pages/email/email_bloc.dart';
 import 'package:mobiclone/pages/name/name_bloc.dart';
 import 'package:mobiclone/pages/sign_up/sign_up_page.dart';
 
 void main() {
+  kiwi.Container()..registerInstance(NameBloc())..registerInstance(EmailBloc());
+
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.white,
   ));
-
-  kiwi.Container()..registerInstance(NameBloc());
 
   runApp(MobicloneApp());
 }

@@ -41,9 +41,7 @@ class NameFormState extends State<NameForm> {
         if (state is ValidatedNameState) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => EmailPage(
-                name: state.value,
-              ),
+              builder: (_) => EmailPage(),
             ),
           );
         }
