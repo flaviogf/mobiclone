@@ -4,7 +4,6 @@ import 'package:kiwi/kiwi.dart' as kiwi;
 import 'package:mobiclone/pages/email/email_bloc.dart';
 import 'package:mobiclone/pages/email/email_event.dart';
 import 'package:mobiclone/pages/email/email_state.dart';
-import 'package:mobiclone/pages/password/password_page.dart';
 
 class EmailPage extends StatelessWidget {
   @override
@@ -39,11 +38,7 @@ class EmailFormState extends State<EmailForm> {
     return BlocListener<EmailBloc, EmailState>(
       listener: (context, state) {
         if (state is ValidatedEmailState) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => PasswordPage(),
-            ),
-          );
+          Navigator.of(context).pushNamed('/password');
         }
 
         if (state is RequiredEmailState) {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiwi/kiwi.dart' as kiwi;
-import 'package:mobiclone/pages/email/email_page.dart';
 import 'package:mobiclone/pages/name/name_bloc.dart';
 import 'package:mobiclone/pages/name/name_event.dart';
 import 'package:mobiclone/pages/name/name_state.dart';
@@ -39,11 +38,7 @@ class NameFormState extends State<NameForm> {
     return BlocListener<NameBloc, NameState>(
       listener: (context, state) {
         if (state is ValidatedNameState) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => EmailPage(),
-            ),
-          );
+          Navigator.of(context).pushNamed('/email');
         }
 
         if (state is RequiredNameState) {

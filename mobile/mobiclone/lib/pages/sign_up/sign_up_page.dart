@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobiclone/pages/name/name_page.dart';
 import 'package:mobiclone/pages/sign_in/sign_in_page.dart';
 
 class SignUpPage extends StatelessWidget {
@@ -48,13 +47,7 @@ class SignUpPage extends StatelessWidget {
                 height: 40.0,
               ),
               RaisedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => NamePage(),
-                    ),
-                  );
-                },
+                onPressed: () => Navigator.of(context).pushNamed('/name'),
                 padding: EdgeInsets.all(24.0),
                 child: Text(
                   'Sign up with email',
