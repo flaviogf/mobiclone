@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kiwi/kiwi.dart' as kiwi;
+import 'package:mobiclone/core/sign_up/email_repository.dart';
+import 'package:mobiclone/core/sign_up/name_repository.dart';
+import 'package:mobiclone/core/sign_up/password_repository.dart';
+import 'package:mobiclone/core/sign_up/sign_up_repository.dart';
 import 'package:mobiclone/pages/email/email_bloc.dart';
 import 'package:mobiclone/pages/email/email_page.dart';
 import 'package:mobiclone/pages/name/name_bloc.dart';
@@ -11,9 +15,24 @@ import 'package:mobiclone/pages/sign_up/sign_up_page.dart';
 
 void main() {
   kiwi.Container()
-    ..registerFactory((_) => NameBloc())
-    ..registerFactory((_) => EmailBloc())
-    ..registerFactory((_) => PasswordBloc());
+    ..registerFactory<NameRepository, SignUpRepository>(
+      (_) => SignUpRepository(),
+    )
+    ..registerFactory<EmailRepository, SignUpRepository>(
+      (_) => SignUpRepository(),
+    )
+    ..registerFactory<PasswordRepository, SignUpRepository>(
+      (_) => SignUpRepository(),
+    )
+    ..registerFactory(
+      (c) => NameBloc(c.resolve()),
+    )
+    ..registerFactory(
+      (c) => EmailBloc(c.resolve()),
+    )
+    ..registerFactory(
+      (c) => PasswordBloc(c.resolve()),
+    );
 
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.white,

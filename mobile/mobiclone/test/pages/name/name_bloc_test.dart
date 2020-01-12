@@ -1,14 +1,20 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mobiclone/core/sign_up/name_repository.dart';
 import 'package:mobiclone/pages/name/name_bloc.dart';
 import 'package:mobiclone/pages/name/name_event.dart';
 import 'package:mobiclone/pages/name/name_state.dart';
+import 'package:mockito/mockito.dart';
+
+class MockNameRepository extends Mock implements NameRepository {}
 
 void main() {
   group('NameBloc should', () {
+    MockNameRepository _nameRepository;
     NameBloc _bloc;
 
     setUp(() {
-      _bloc = NameBloc();
+      _nameRepository = MockNameRepository();
+      _bloc = NameBloc(_nameRepository);
     });
 
     tearDown(() {
@@ -25,6 +31,12 @@ void main() {
     test(
       'return "ValidatedNameState" when the name submitted is valid',
       () {
+        when(
+          _nameRepository.addName('flavio'),
+        ).thenAnswer(
+          (_) => Future.value('flavio'),
+        );
+
         _bloc.add(NameEventSubmit('flavio'));
 
         expectLater(

@@ -1,8 +1,13 @@
 import 'package:bloc/bloc.dart';
+import 'package:mobiclone/core/sign_up/password_repository.dart';
 import 'package:mobiclone/pages/password/password_event.dart';
 import 'package:mobiclone/pages/password/password_state.dart';
 
 class PasswordBloc extends Bloc<PasswordEvent, PasswordState> {
+  final PasswordRepository _passwordRepository;
+
+  PasswordBloc(this._passwordRepository);
+
   @override
   PasswordState get initialState => InitiatedPasswordState();
 
@@ -17,7 +22,8 @@ class PasswordBloc extends Bloc<PasswordEvent, PasswordState> {
           'The password must be informed.',
         );
       } else {
-        yield ValidatedPasswordState(event.value);
+        final password = await _passwordRepository.addPassword(event.value);
+        yield ValidatedPasswordState(password);
       }
     }
   }

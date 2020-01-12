@@ -1,8 +1,13 @@
 import 'package:bloc/bloc.dart';
+import 'package:mobiclone/core/sign_up/email_repository.dart';
 import 'package:mobiclone/pages/email/email_event.dart';
 import 'package:mobiclone/pages/email/email_state.dart';
 
 class EmailBloc extends Bloc<EmailEvent, EmailState> {
+  final EmailRepository _emailRepository;
+
+  EmailBloc(this._emailRepository);
+
   @override
   EmailState get initialState => InitiatedEmailState();
 
@@ -14,7 +19,8 @@ class EmailBloc extends Bloc<EmailEvent, EmailState> {
       if (event.value.isEmpty) {
         yield RequiredEmailState(event.value, 'The email must be informed.');
       } else {
-        yield ValidatedEmailState(event.value);
+        final String email = await _emailRepository.addEmail(event.value);
+        yield ValidatedEmailState(email);
       }
     }
   }
