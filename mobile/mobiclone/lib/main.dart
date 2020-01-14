@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kiwi/kiwi.dart' as kiwi;
-import 'package:mobiclone/core/sign_up/email_repository.dart';
-import 'package:mobiclone/core/sign_up/name_repository.dart';
-import 'package:mobiclone/core/sign_up/password_repository.dart';
-import 'package:mobiclone/core/sign_up/sign_up_repository.dart';
+import 'package:mobiclone/data/user_repository.dart';
 import 'package:mobiclone/pages/email/email_bloc.dart';
 import 'package:mobiclone/pages/email/email_page.dart';
 import 'package:mobiclone/pages/name/name_bloc.dart';
@@ -12,17 +9,25 @@ import 'package:mobiclone/pages/name/name_page.dart';
 import 'package:mobiclone/pages/password/password_bloc.dart';
 import 'package:mobiclone/pages/password/password_page.dart';
 import 'package:mobiclone/pages/sign_up/sign_up_page.dart';
+import 'package:mobiclone/services/user_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.white,
+  ));
+
+  runApp(MobicloneApp());
+
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+
   kiwi.Container()
-    ..registerFactory<NameRepository, SignUpRepository>(
-      (_) => SignUpRepository(),
+    ..registerInstance(preferences)
+    ..registerFactory(
+      (_) => UserService(),
     )
-    ..registerFactory<EmailRepository, SignUpRepository>(
-      (_) => SignUpRepository(),
-    )
-    ..registerFactory<PasswordRepository, SignUpRepository>(
-      (_) => SignUpRepository(),
+    ..registerFactory(
+      (c) => UserRepository(c.resolve()),
     )
     ..registerFactory(
       (c) => NameBloc(c.resolve()),
@@ -31,14 +36,11 @@ void main() {
       (c) => EmailBloc(c.resolve()),
     )
     ..registerFactory(
-      (c) => PasswordBloc(c.resolve()),
+      (c) => PasswordBloc(
+        c.resolve(),
+        c.resolve(),
+      ),
     );
-
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.white,
-  ));
-
-  runApp(MobicloneApp());
 }
 
 class MobicloneApp extends StatelessWidget {

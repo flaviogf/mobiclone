@@ -2,10 +2,10 @@ import 'package:equatable/equatable.dart';
 
 abstract class PasswordEvent extends Equatable {}
 
-class PasswordEventSubmit extends PasswordEvent {
+class SubmitPasswordEvent extends PasswordEvent {
   final String value;
 
-  PasswordEventSubmit(this.value);
+  SubmitPasswordEvent(this.value);
 
   @override
   List<Object> get props => [];

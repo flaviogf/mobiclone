@@ -94,7 +94,7 @@ class NameFormState extends State<NameForm> {
                   padding: EdgeInsets.all(24.0),
                   onPressed: () {
                     BlocProvider.of<NameBloc>(context).add(
-                      NameEventSubmit(_nameController.text),
+                      SubmitNameEvent(_nameController.text),
                     );
                   },
                   child: Row(

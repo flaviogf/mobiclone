@@ -2,10 +2,10 @@ import 'package:equatable/equatable.dart';
 
 abstract class EmailEvent extends Equatable {}
 
-class EmailEventSubmit extends EmailEvent {
+class SubmitEmailEvent extends EmailEvent {
   final String value;
 
-  EmailEventSubmit(this.value);
+  SubmitEmailEvent(this.value);
 
   @override
   List<Object> get props => [value];

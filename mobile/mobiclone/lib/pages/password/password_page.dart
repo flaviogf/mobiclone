@@ -94,7 +94,7 @@ class PasswordFormState extends State<PasswordForm> {
                   padding: EdgeInsets.all(24.0),
                   onPressed: () {
                     BlocProvider.of<PasswordBloc>(context).add(
-                      PasswordEventSubmit(_passwordController.text),
+                      SubmitPasswordEvent(_passwordController.text),
                     );
                   },
                   child: Row(

@@ -1,20 +1,25 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobiclone/core/sign_up/password_repository.dart';
+import 'package:mobiclone/data/user_repository.dart';
 import 'package:mobiclone/pages/password/password_bloc.dart';
 import 'package:mobiclone/pages/password/password_event.dart';
 import 'package:mobiclone/pages/password/password_state.dart';
+import 'package:mobiclone/services/user_service.dart';
 import 'package:mockito/mockito.dart';
 
-class MockPasswordRepository extends Mock implements PasswordRepository {}
+class MockUserRepository extends Mock implements UserRepository {}
+
+class MockUserService extends Mock implements UserService {}
 
 void main() {
   group('PasswordBloc should', () {
-    MockPasswordRepository _passwordRepository;
+    MockUserRepository userRepository;
+    MockUserService _userService;
     PasswordBloc _bloc;
 
     setUp(() {
-      _passwordRepository = MockPasswordRepository();
-      _bloc = PasswordBloc(_passwordRepository);
+      userRepository = MockUserRepository();
+      _userService = MockUserService();
+      _bloc = PasswordBloc(userRepository, _userService);
     });
 
     tearDown(() {
@@ -32,12 +37,12 @@ void main() {
       'return "ValidatedPasswordState" when the password submitted is valid',
       () {
         when(
-          _passwordRepository.addPassword('test123'),
+          userRepository.addPassword('test123'),
         ).thenAnswer(
           (_) => Future.value('test123'),
         );
 
-        _bloc.add(PasswordEventSubmit('test123'));
+        _bloc.add(SubmitPasswordEvent('test123'));
 
         expectLater(
           _bloc,
@@ -53,7 +58,7 @@ void main() {
     test(
       'return "RequiredPasswordState" when the password submitted is empty',
       () {
-        _bloc.add(PasswordEventSubmit(''));
+        _bloc.add(SubmitPasswordEvent(''));
 
         expectLater(
           _bloc,

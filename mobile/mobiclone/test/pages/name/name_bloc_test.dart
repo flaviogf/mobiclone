@@ -1,20 +1,20 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobiclone/core/sign_up/name_repository.dart';
+import 'package:mobiclone/data/user_repository.dart';
 import 'package:mobiclone/pages/name/name_bloc.dart';
 import 'package:mobiclone/pages/name/name_event.dart';
 import 'package:mobiclone/pages/name/name_state.dart';
 import 'package:mockito/mockito.dart';
 
-class MockNameRepository extends Mock implements NameRepository {}
+class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
   group('NameBloc should', () {
-    MockNameRepository _nameRepository;
+    MockUserRepository _userRepository;
     NameBloc _bloc;
 
     setUp(() {
-      _nameRepository = MockNameRepository();
-      _bloc = NameBloc(_nameRepository);
+      _userRepository = MockUserRepository();
+      _bloc = NameBloc(_userRepository);
     });
 
     tearDown(() {
@@ -32,12 +32,12 @@ void main() {
       'return "ValidatedNameState" when the name submitted is valid',
       () {
         when(
-          _nameRepository.addName('flavio'),
+          _userRepository.addName('flavio'),
         ).thenAnswer(
           (_) => Future.value('flavio'),
         );
 
-        _bloc.add(NameEventSubmit('flavio'));
+        _bloc.add(SubmitNameEvent('flavio'));
 
         expectLater(
           _bloc,
@@ -53,7 +53,7 @@ void main() {
     test(
       'return "RequiredNameState" when the name submitted is empty',
       () {
-        _bloc.add(NameEventSubmit(''));
+        _bloc.add(SubmitNameEvent(''));
 
         expectLater(
           _bloc,

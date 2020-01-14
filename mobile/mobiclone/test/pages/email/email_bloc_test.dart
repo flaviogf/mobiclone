@@ -1,20 +1,20 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobiclone/core/sign_up/email_repository.dart';
+import 'package:mobiclone/data/user_repository.dart';
 import 'package:mobiclone/pages/email/email_bloc.dart';
 import 'package:mobiclone/pages/email/email_event.dart';
 import 'package:mobiclone/pages/email/email_state.dart';
 import 'package:mockito/mockito.dart';
 
-class MockEmailRepository extends Mock implements EmailRepository {}
+class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
   group('EmailBloc should', () {
-    MockEmailRepository _emailRepository;
+    MockUserRepository _userRepository;
     EmailBloc _bloc;
 
     setUp(() {
-      _emailRepository = MockEmailRepository();
-      _bloc = EmailBloc(_emailRepository);
+      _userRepository = MockUserRepository();
+      _bloc = EmailBloc(_userRepository);
     });
 
     tearDown(() {
@@ -29,12 +29,12 @@ void main() {
       'return "ValidateEmailState" when the email submitted is valid',
       () {
         when(
-          _emailRepository.addEmail('flavio@email.com'),
+          _userRepository.addEmail('flavio@email.com'),
         ).thenAnswer(
           (_) => Future.value(('flavio@email.com')),
         );
 
-        _bloc.add(EmailEventSubmit('flavio@email.com'));
+        _bloc.add(SubmitEmailEvent('flavio@email.com'));
 
         expect(
           _bloc,
@@ -50,7 +50,7 @@ void main() {
     test(
       'return "RequiredEmailState" when the email submitted is empty',
       () {
-        _bloc.add(EmailEventSubmit(''));
+        _bloc.add(SubmitEmailEvent(''));
 
         expect(
           _bloc,

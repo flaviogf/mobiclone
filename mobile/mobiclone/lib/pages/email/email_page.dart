@@ -94,7 +94,7 @@ class EmailFormState extends State<EmailForm> {
                   padding: EdgeInsets.all(24.0),
                   onPressed: () {
                     BlocProvider.of<EmailBloc>(context).add(
-                      EmailEventSubmit(_emailController.text),
+                      SubmitEmailEvent(_emailController.text),
                     );
                   },
                   child: Row(
