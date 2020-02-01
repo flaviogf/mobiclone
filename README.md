@@ -11,7 +11,7 @@
 
 ## :rocket: Project
 
-:globe_with_meridians: This project is a clone of Mobilis app that was made just only study.
+:moneybag: This project is a clone of Mobilis app that was made just only study.
 
 ## :computer: Techs
 
