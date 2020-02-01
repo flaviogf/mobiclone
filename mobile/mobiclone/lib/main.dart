@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:kiwi/kiwi.dart' as kiwi;
+import 'package:mobiclone/pages/sign_in_with_email/sign_in_with_email_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobiclone/data/user_repository.dart';
 import 'package:mobiclone/pages/email/email_bloc.dart';
@@ -11,8 +12,9 @@ import 'package:mobiclone/pages/name/name_page.dart';
 import 'package:mobiclone/pages/password/password_bloc.dart';
 import 'package:mobiclone/pages/password/password_page.dart';
 import 'package:mobiclone/pages/sign_up/sign_up_page.dart';
-import 'package:mobiclone/pages/sign_in_with_email/sign_in_with_email.dart';
+import 'package:mobiclone/pages/sign_in_with_email/sign_in_with_email_page.dart';
 import 'package:mobiclone/services/user_service.dart';
+import 'package:mobiclone/services/session_service.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -32,6 +34,9 @@ void main() async {
       (c) => UserService(c.resolve()),
     )
     ..registerFactory(
+      (c) => SessionService(c.resolve()),
+    )
+    ..registerFactory(
       (c) => UserRepository(c.resolve()),
     )
     ..registerFactory(
@@ -45,6 +50,9 @@ void main() async {
         c.resolve(),
         c.resolve(),
       ),
+    )
+    ..registerFactory(
+      (c) => SignInWithEmailBloc(c.resolve()),
     );
 }
 
@@ -58,7 +66,7 @@ class MobicloneApp extends StatelessWidget {
         '/name': (context) => NamePage(),
         '/email': (context) => EmailPage(),
         '/password': (context) => PasswordPage(),
-        '/sign-in-with-email': (context) => SignInWithEmail(),
+        '/sign-in-with-email': (context) => SignInWithEmailPage(),
       },
       theme: ThemeData(
         primaryColor: Colors.deepPurple[900],
