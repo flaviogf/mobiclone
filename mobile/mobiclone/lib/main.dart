@@ -11,6 +11,7 @@ import 'package:mobiclone/pages/name/name_page.dart';
 import 'package:mobiclone/pages/password/password_bloc.dart';
 import 'package:mobiclone/pages/password/password_page.dart';
 import 'package:mobiclone/pages/sign_up/sign_up_page.dart';
+import 'package:mobiclone/pages/sign_in_with_email/sign_in_with_email.dart';
 import 'package:mobiclone/services/user_service.dart';
 
 void main() async {
@@ -56,7 +57,8 @@ class MobicloneApp extends StatelessWidget {
         '/': (context) => SignUpPage(),
         '/name': (context) => NamePage(),
         '/email': (context) => EmailPage(),
-        '/password': (context) => PasswordPage()
+        '/password': (context) => PasswordPage(),
+        '/sign-in-with-email': (context) => SignInWithEmail(),
       },
       theme: ThemeData(
         primaryColor: Colors.deepPurple[900],

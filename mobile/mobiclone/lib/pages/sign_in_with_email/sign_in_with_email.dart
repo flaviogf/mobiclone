@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
-class SignInPage extends StatelessWidget {
+class SignInWithEmail extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => SignInWithEmailState();
+}
+
+class SignInWithEmailState extends State<SignInWithEmail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,7 +21,6 @@ class SignInPage extends StatelessWidget {
         child: SingleChildScrollView(
           padding: EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Center(
                 child: Container(
@@ -38,7 +42,7 @@ class SignInPage extends StatelessWidget {
               ),
               Center(
                 child: Text(
-                  'Sign in to start',
+                  'Welcome back.',
                   style: TextStyle(
                     color: Colors.black54,
                     fontSize: 32.0,
@@ -46,32 +50,40 @@ class SignInPage extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: 40.0,
+                height: 24.0,
               ),
-              RaisedButton(
-                padding: EdgeInsets.all(24.0),
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/sign-in-with-email');
-                },
-                child: Text(
-                  'Sign in with email',
-                  style: TextStyle(
-                    fontSize: 20.0,
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Email',
                   ),
                 ),
               ),
-              SizedBox(
-                height: 24.0,
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Password',
+                  ),
+                  obscureText: true,
+                ),
               ),
-              OutlineButton(
-                padding: EdgeInsets.all(24.0),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'Back',
-                  style: TextStyle(
-                    fontSize: 20.0,
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: RaisedButton(
+                    padding: EdgeInsets.all(24.0),
+                    onPressed: () {},
+                    child: Text(
+                      'Sign In',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                      ),
+                    ),
                   ),
                 ),
               )
