@@ -5,6 +5,7 @@ import 'package:mobiclone/pages/password/password_bloc.dart';
 import 'package:mobiclone/pages/password/password_event.dart';
 import 'package:mobiclone/pages/password/password_state.dart';
 
+
 class PasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -37,8 +38,14 @@ class PasswordFormState extends State<PasswordForm> {
   Widget build(BuildContext context) {
     return BlocListener<PasswordBloc, PasswordState>(
       listener: (context, state) {
-        if (state is ValidatedPasswordState) {
+        if (state is CreatedUserPasswordState) {
           Navigator.of(context).popUntil((routes) => routes.isFirst);
+        }
+
+        if(state is UnCreatedUserPasswordState) {
+          Scaffold.of(context).showSnackBar(
+            SnackBar(content: Text("It wasn't worked as expected. Please check the informed data.")),
+          );          
         }
 
         if (state is RequiredPasswordState) {

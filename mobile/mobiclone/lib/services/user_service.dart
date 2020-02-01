@@ -24,6 +24,8 @@ class UserService {
       body: json.encode(values),
     );
 
-    return user;
+    final bool created = response.statusCode == 201;
+
+    return created ? user : null;
   }
 }

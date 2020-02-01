@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:mobiclone/models/user.dart';
 
 abstract class PasswordState extends Equatable {}
 
@@ -16,10 +17,19 @@ class SubmittedPasswordState extends PasswordState {
   List<Object> get props => [value];
 }
 
-class ValidatedPasswordState extends PasswordState {
-  final String value;
+class CreatedUserPasswordState extends PasswordState {
+  final User value;
 
-  ValidatedPasswordState(this.value);
+  CreatedUserPasswordState(this.value);
+
+  @override
+  List<Object> get props => [value];
+}
+
+class UnCreatedUserPasswordState extends PasswordState {
+  final User value;
+
+  UnCreatedUserPasswordState(this.value);
 
   @override
   List<Object> get props => [value];
