@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:kiwi/kiwi.dart' as kiwi;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobiclone/data/user_repository.dart';
 import 'package:mobiclone/pages/email/email_bloc.dart';
 import 'package:mobiclone/pages/email/email_page.dart';
@@ -10,7 +12,6 @@ import 'package:mobiclone/pages/password/password_bloc.dart';
 import 'package:mobiclone/pages/password/password_page.dart';
 import 'package:mobiclone/pages/sign_up/sign_up_page.dart';
 import 'package:mobiclone/services/user_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -21,10 +22,13 @@ void main() async {
 
   SharedPreferences preferences = await SharedPreferences.getInstance();
 
+  http.Client client = http.Client();
+
   kiwi.Container()
     ..registerInstance(preferences)
+    ..registerInstance(client)
     ..registerFactory(
-      (_) => UserService(),
+      (c) => UserService(c.resolve()),
     )
     ..registerFactory(
       (c) => UserRepository(c.resolve()),

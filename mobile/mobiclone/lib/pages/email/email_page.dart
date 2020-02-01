@@ -68,8 +68,7 @@ class EmailFormState extends State<EmailForm> {
                   flex: 1,
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
-                    child: TextField(
-                      textAlignVertical: TextAlignVertical.center,
+                    child: TextFormField(
                       controller: _emailController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -82,8 +81,7 @@ class EmailFormState extends State<EmailForm> {
                         color: Colors.black54,
                         fontSize: 36.0,
                       ),
-                      maxLines: null,
-                      expands: true,
+                      keyboardType: TextInputType.emailAddress,
                     ),
                   ),
                 ),

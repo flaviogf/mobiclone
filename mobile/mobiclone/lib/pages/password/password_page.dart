@@ -68,8 +68,7 @@ class PasswordFormState extends State<PasswordForm> {
                   flex: 1,
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
-                    child: TextField(
-                      textAlignVertical: TextAlignVertical.center,
+                    child: TextFormField(
                       controller: _passwordController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -82,8 +81,8 @@ class PasswordFormState extends State<PasswordForm> {
                         fontSize: 36.0,
                         color: Colors.black54,
                       ),
-                      maxLines: null,
-                      expands: true,
+                      obscureText: true,
+                      keyboardType: TextInputType.visiblePassword,
                     ),
                   ),
                 ),

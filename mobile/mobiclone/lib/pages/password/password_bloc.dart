@@ -1,8 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:mobiclone/data/user_repository.dart';
+import 'package:mobiclone/models/user.dart';
 import 'package:mobiclone/pages/password/password_event.dart';
 import 'package:mobiclone/pages/password/password_state.dart';
 import 'package:mobiclone/services/user_service.dart';
+
+import 'password_state.dart';
 
 class PasswordBloc extends Bloc<PasswordEvent, PasswordState> {
   final UserRepository _userRepository;
@@ -24,8 +27,13 @@ class PasswordBloc extends Bloc<PasswordEvent, PasswordState> {
           'The password must be informed.',
         );
       } else {
+        final name = await _userRepository.getName();
+        final email = await _userRepository.getEmail();
         final password = await _userRepository.addPassword(event.value);
-        yield ValidatedPasswordState(password);
+
+        await _userService.addUser(User(name, email, password));
+
+        yield ValidatedPasswordState(event.value);
       }
     }
   }

@@ -69,7 +69,6 @@ class NameFormState extends State<NameForm> {
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
                     child: TextFormField(
-                      textAlignVertical: TextAlignVertical.center,
                       controller: _nameController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -82,8 +81,6 @@ class NameFormState extends State<NameForm> {
                         color: Colors.black54,
                         fontSize: 36.0,
                       ),
-                      maxLines: null,
-                      expands: true,
                     ),
                   ),
                 ),
