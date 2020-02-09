@@ -22,7 +22,7 @@
 ## :thinking: How to use
 
 ````sh
-cd ./backend/Mobiclone
+cd ./Mobiclone
 ````
 
 ````sh
@@ -30,7 +30,7 @@ dotnet restore
 ````
 
 ````sh
-cd ./backend/Mobiclone/Mobiclone.Api
+cd ./Mobiclone/Mobiclone.Api
 ````
 
 ````sh
