@@ -18,7 +18,6 @@
 ## :computer: Techs
 
 - [ASP.NET Core](https://docs.microsoft.com/pt-br/aspnet/?view=aspnetcore-3.1#pivot=core)
-- [Flutter](https://flutter.dev/)
 
 ## :thinking: How to use
 
