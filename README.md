@@ -11,7 +11,9 @@
 
 ## :rocket: Project
 
-:moneybag: This project is a clone of Mobills app that was made just only study.
+:moneybag: This project is a web API that contains some functionalities inspired by the app Mobills. It was made just only study.
+
+![Documentation](/.github/docs.png)
 
 ## :computer: Techs
 
@@ -19,8 +21,6 @@
 - [Flutter](https://flutter.dev/)
 
 ## :thinking: How to use
-
-### Backend
 
 ````sh
 cd ./backend/Mobiclone
@@ -40,20 +40,6 @@ dotnet ef database update
 
 ````sh
 dotnet run
-````
-
-### Mobile
-
-````sh
-cd ./mobile/mobiclone
-````
-
-````sh
-flutter pub get
-````
-
-````sh
-flutter run
 ````
 
 ## :memo: Licença
